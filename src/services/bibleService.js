@@ -1,7 +1,7 @@
-import { books } from "../data/books"
+import { books } from "../data/bible/books.meta"
 import { validateBibleBook, validateBookMeta } from "../data/schema/bibleSchema"
 
-const bibleBookModules = import.meta.glob("../data/bible/*.json")
+const bibleBookModules = import.meta.glob("../data/bible/books/*.json")
 const bibleBookLoadersByFile = Object.fromEntries(
   Object.entries(bibleBookModules).map(([path, loader]) => [path.split("/").at(-1), loader]),
 )
@@ -16,6 +16,7 @@ export function validateBooksCatalog() {
   const issues = []
   const ids = new Set()
   const orders = new Set()
+  const knownFiles = new Set(Object.keys(bibleBookLoadersByFile))
 
   sortedBooks.forEach((book, index) => {
     const result = validateBookMeta(book)
@@ -27,6 +28,9 @@ export function validateBooksCatalog() {
     }
     if (orders.has(book.order)) {
       issues.push(`Duplicate book order: ${book.order}`)
+    }
+    if (!knownFiles.has(book.file)) {
+      issues.push(`Missing bible JSON file for ${book.id}: ${book.file}`)
     }
     ids.add(book.id)
     orders.add(book.order)
