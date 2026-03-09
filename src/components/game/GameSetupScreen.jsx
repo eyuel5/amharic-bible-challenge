@@ -16,8 +16,8 @@ export default function GameSetupScreen({
 
   return (
     <section className="mt-8 space-y-6">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6">
-        <p className="text-sm uppercase tracking-wide text-slate-400">Choose Mode</p>
+      <div className="surface p-6">
+        <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">Choose Mode</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {modes.map((mode) => {
             const selected = mode.id === selectedModeId
@@ -26,36 +26,28 @@ export default function GameSetupScreen({
                 key={mode.id}
                 type="button"
                 onClick={() => onSelectMode(mode.id)}
-                className={`rounded-xl border p-4 text-left transition ${
-                  selected
-                    ? "border-emerald-500 bg-emerald-500/15"
-                    : "border-slate-700 bg-slate-950 hover:border-slate-500"
-                }`}
+                className={`mode-card p-4 text-left ${selected ? "active" : ""}`}
               >
-                <p className="text-base font-semibold text-slate-100">{mode.label}</p>
-                <p className="mt-1 text-sm text-slate-300">{mode.description}</p>
+                <p className="title-font text-base font-semibold text-[var(--text)]">{mode.label}</p>
+                <p className="mt-1 text-sm text-[var(--text-soft)]">{mode.description}</p>
               </button>
             )
           })}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
-        <p className="text-sm uppercase tracking-wide text-slate-400">Session Settings</p>
+      <div className="surface-soft p-6">
+        <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">Session Settings</p>
 
         <div className="mt-4">
-          <p className="text-sm text-slate-300">Questions per session</p>
+          <p className="text-sm text-[var(--text-soft)]">Questions per session</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {[5, 10, 15, 20].map((count) => (
               <button
                 key={count}
                 type="button"
                 onClick={() => onQuestionCountChange(count)}
-                className={`rounded-md border px-3 py-2 text-sm transition ${
-                  questionCount === count
-                    ? "border-emerald-500 bg-emerald-500/15 text-emerald-200"
-                    : "border-slate-700 bg-slate-950 text-slate-200 hover:border-slate-500"
-                }`}
+                className={`chip-btn px-3 py-2 text-sm ${questionCount === count ? "active" : ""}`}
               >
                 {count}
               </button>
@@ -64,7 +56,7 @@ export default function GameSetupScreen({
         </div>
 
         <div className="mt-6">
-          <p className="text-sm text-slate-300">Question source</p>
+          <p className="text-sm text-[var(--text-soft)]">Question source</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {[
               { id: "all", label: "All" },
@@ -76,11 +68,7 @@ export default function GameSetupScreen({
                 key={scope.id}
                 type="button"
                 onClick={() => onSourceScopeChange(scope.id)}
-                className={`rounded-md border px-3 py-2 text-sm transition ${
-                  sourceScope === scope.id
-                    ? "border-emerald-500 bg-emerald-500/15 text-emerald-200"
-                    : "border-slate-700 bg-slate-950 text-slate-200 hover:border-slate-500"
-                }`}
+                className={`chip-btn px-3 py-2 text-sm ${sourceScope === scope.id ? "active" : ""}`}
               >
                 {scope.label}
               </button>
@@ -88,16 +76,16 @@ export default function GameSetupScreen({
           </div>
 
           {!canUseSingleBook && (
-            <p className="mt-3 text-xs text-slate-400">
+            <p className="mt-3 text-xs text-[var(--text-soft)]">
               Single-book source is disabled for this mode because the player is guessing the book name.
             </p>
           )}
 
           {canUseSingleBook && sourceScope === "single" && (
             <div className="mt-4">
-              <p className="text-sm text-slate-300">Select book</p>
+              <p className="text-sm text-[var(--text-soft)]">Select book</p>
               <select
-                className="mt-2 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+                className="mt-2 w-full rounded-md border border-[var(--stroke)] bg-[var(--panel)] px-3 py-2 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)]"
                 value={sourceBookId}
                 onChange={(event) => onSourceBookChange(event.target.value)}
               >
@@ -115,7 +103,7 @@ export default function GameSetupScreen({
       <button
         type="button"
         onClick={onStart}
-        className="w-full rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-slate-950 sm:w-auto"
+        className="primary-btn w-full px-5 py-3 text-sm sm:w-auto"
       >
         Start Game
       </button>

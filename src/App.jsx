@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
+import { Settings } from "lucide-react"
 import GameResultsScreen from "./components/game/GameResultsScreen"
+import GameSettingsPanel from "./components/game/GameSettingsPanel"
 import GameSetupScreen from "./components/game/GameSetupScreen"
 import VerseToBookGame from "./components/game/VerseToBookGame"
 import { getAllBooks, validateBooksCatalog } from "./services/bibleService"
@@ -15,13 +17,28 @@ const modes = [
 ]
 
 const allBooks = getAllBooks()
+const availableThemePacks = new Set([
+  "serika-dark",
+  "graphite",
+  "ocean",
+  "lotus",
+  "sandstone",
+  "inkwell",
+  "dawn",
+])
 
 function App() {
+  const [themePack, setThemePack] = useState(() => {
+    const saved = window.localStorage.getItem("themePack")
+    if (saved && availableThemePacks.has(saved)) return saved
+    return "serika-dark"
+  })
   const [modeId, setModeId] = useState(modes[0].id)
   const [questionCount, setQuestionCount] = useState(10)
   const [sourceScope, setSourceScope] = useState("all")
   const [sourceBookId, setSourceBookId] = useState(allBooks[0]?.id ?? "")
   const [stage, setStage] = useState("setup")
+  const [previousStage, setPreviousStage] = useState("setup")
   const [sessionResult, setSessionResult] = useState(null)
   const [sessionKey, setSessionKey] = useState(0)
 
@@ -38,6 +55,11 @@ function App() {
       console.warn("Book metadata issues:", check.issues)
     }
   }, [])
+
+  useEffect(() => {
+    document.body.setAttribute("data-theme-pack", themePack)
+    window.localStorage.setItem("themePack", themePack)
+  }, [themePack])
 
   const ActiveGameComponent = activeMode.Component
 
@@ -62,11 +84,35 @@ function App() {
     setStage("playing")
   }
 
+  function openSettings() {
+    setPreviousStage(stage)
+    setStage("settings")
+  }
+
+  function closeSettings() {
+    setStage(previousStage === "settings" ? "setup" : previousStage)
+  }
+
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100">
-      <section className="mx-auto w-full max-w-4xl px-6 py-10">
-        <p className="text-xs uppercase tracking-[0.2em] text-emerald-400">Amharic Bible Challenge</p>
-        <h1 className="mt-2 text-3xl font-bold sm:text-4xl">Bible Quiz Game</h1>
+    <main className="app-shell">
+      <section className="mx-auto w-full max-w-5xl px-5 py-8 sm:py-10">
+        <header className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-start">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-soft)]">Amharic Bible Challenge</p>
+            <h1 className="title-font mt-2 text-4xl font-semibold sm:text-5xl">Scripture Quest</h1>
+            <p className="mt-2 text-sm text-[var(--text-soft)]">
+              A focused Bible quiz experience with purposeful modes and session-based play.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={openSettings}
+            className="chip-btn inline-flex h-11 w-11 items-center justify-center self-start"
+            aria-label="Open settings"
+          >
+            <Settings size={18} />
+          </button>
+        </header>
 
         {stage === "setup" && (
           <GameSetupScreen
@@ -100,6 +146,15 @@ function App() {
             onPlayAgain={playAgain}
             onBackToSetup={() => setStage("setup")}
           />
+        )}
+
+        {stage === "settings" && (
+          <section className="mt-8 space-y-4">
+            <GameSettingsPanel themePack={themePack} onThemePackChange={setThemePack} />
+            <button type="button" onClick={closeSettings} className="ghost-btn px-5 py-3 text-sm">
+              Back
+            </button>
+          </section>
         )}
       </section>
     </main>

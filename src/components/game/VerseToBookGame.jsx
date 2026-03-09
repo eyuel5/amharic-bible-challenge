@@ -106,8 +106,8 @@ export default function VerseToBookGame({ questionCount, sourceScope, sourceBook
 
   return (
     <>
-      <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900/60 p-4 text-sm">
-        <p className="text-slate-200">
+      <div className="surface mt-6 p-4 text-sm">
+        <p className="text-[var(--text)]">
           Progress:{" "}
           <span className="font-semibold">
             {Math.min(round + (answerResult ? 0 : 1), questionCount)} / {questionCount}
@@ -115,14 +115,14 @@ export default function VerseToBookGame({ questionCount, sourceScope, sourceBook
         </p>
       </div>
 
-      <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900/40 p-5">
-        {loading && <p className="text-slate-300">Preparing question...</p>}
-        {!loading && error && <p className="text-rose-400">{error}</p>}
+      <div className="surface-soft mt-6 p-5">
+        {loading && <p className="text-[var(--text-soft)]">Preparing question...</p>}
+        {!loading && error && <p className="text-[var(--danger)]">{error}</p>}
 
         {!loading && !error && currentQuestion && (
           <>
-            <p className="text-sm uppercase tracking-wide text-slate-400">Which book is this verse from?</p>
-            <p className="mt-3 rounded-lg border border-slate-700 bg-slate-950 p-4 text-base leading-7 text-slate-100">
+            <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">Which book is this verse from?</p>
+            <p className="mt-3 rounded-lg border border-[var(--stroke)] bg-[var(--panel)] p-4 text-base leading-7 text-[var(--text)]">
               "{currentQuestion.prompt}"
             </p>
 
@@ -140,10 +140,10 @@ export default function VerseToBookGame({ questionCount, sourceScope, sourceBook
                     disabled={Boolean(answerResult)}
                     className={`rounded-md border px-4 py-3 text-left text-sm transition ${
                       isCorrectAnswer
-                        ? "border-emerald-500 bg-emerald-500/20 text-emerald-100"
+                        ? "border-[var(--success)] bg-[color-mix(in_oklab,var(--success)_22%,var(--panel))] text-[var(--text)]"
                         : isWrongSelected
-                          ? "border-rose-500 bg-rose-500/20 text-rose-100"
-                          : "border-slate-700 bg-slate-950 text-slate-100 hover:border-slate-500"
+                          ? "border-[var(--danger)] bg-[color-mix(in_oklab,var(--danger)_22%,var(--panel))] text-[var(--text)]"
+                          : "border-[var(--stroke)] bg-[var(--panel)] text-[var(--text)] hover:border-[var(--accent)]"
                     } disabled:cursor-not-allowed`}
                   >
                     {option.nameAm}
@@ -153,11 +153,11 @@ export default function VerseToBookGame({ questionCount, sourceScope, sourceBook
             </div>
 
             {answerResult && (
-              <div className="mt-5 rounded-lg border border-slate-700 bg-slate-950 p-4 text-sm">
-                <p className={answerResult === "correct" ? "text-emerald-400" : "text-rose-400"}>
+              <div className="mt-5 rounded-lg border border-[var(--stroke)] bg-[var(--panel)] p-4 text-sm">
+                <p className={answerResult === "correct" ? "text-[var(--success)]" : "text-[var(--danger)]"}>
                   {answerResult === "correct" ? "Correct." : "Not correct."}
                 </p>
-                <p className="mt-2 text-slate-300">
+                <p className="mt-2 text-[var(--text-soft)]">
                   Answer: {currentQuestion.answerBookName} (Chapter {currentQuestion.answerChapter}, Verse{" "}
                   {currentQuestion.answerVerseNumber})
                 </p>
@@ -165,7 +165,7 @@ export default function VerseToBookGame({ questionCount, sourceScope, sourceBook
                   <button
                     type="button"
                     onClick={finishSession}
-                    className="mt-4 rounded-md bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950"
+                    className="primary-btn mt-4 px-4 py-2 text-sm"
                   >
                     See Results
                   </button>
@@ -173,7 +173,7 @@ export default function VerseToBookGame({ questionCount, sourceScope, sourceBook
                   <button
                     type="button"
                     onClick={startNextRound}
-                    className="mt-4 rounded-md bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950"
+                    className="primary-btn mt-4 px-4 py-2 text-sm"
                   >
                     Next Question
                   </button>

@@ -1,1 +1,177 @@
 @import "tailwindcss";
+
+:root {
+  --font-body: "IBM Plex Sans", "Segoe UI", Tahoma, sans-serif;
+  --font-title: "IBM Plex Sans", "Segoe UI", Tahoma, sans-serif;
+}
+
+body[data-theme-pack="serika-dark"] {
+  --bg: #323437;
+  --panel: #2c2e31;
+  --panel-soft: #2a2c2f;
+  --stroke: #3d4043;
+  --text: #d1d0c5;
+  --text-soft: #85898f;
+  --accent: #d9cbc2;
+  --accent-ink: #1e1f21;
+  --success: #79d69f;
+  --danger: #f26d78;
+}
+
+body[data-theme-pack="graphite"] {
+  --bg: #1f2329;
+  --panel: #252a31;
+  --panel-soft: #22272e;
+  --stroke: #353b45;
+  --text: #d3c6aa;
+  --text-soft: #8f949d;
+  --accent: #d3c6aa;
+  --accent-ink: #1f241b;
+  --success: #7fc98f;
+  --danger: #e67e80;
+}
+
+body[data-theme-pack="ocean"] {
+  --bg: #0f1720;
+  --panel: #162330;
+  --panel-soft: #13202c;
+  --stroke: #243848;
+  --text: #cde6f5;
+  --text-soft: #84a5bb;
+  --accent: #5eead4;
+  --accent-ink: #0e1c23;
+  --success: #63d0b3;
+  --danger: #ff8b8b;
+}
+
+body[data-theme-pack="lotus"] {
+  --bg: #221b25;
+  --panel: #2d2431;
+  --panel-soft: #362b3b;
+  --stroke: #4a3a51;
+  --text: #e8d9ee;
+  --text-soft: #b69ec0;
+  --accent: #d59edb;
+  --accent-ink: #281d2d;
+  --success: #8ac6b3;
+  --danger: #f09db2;
+}
+
+body[data-theme-pack="sandstone"] {
+  --bg: #f1e6d8;
+  --panel: #eadcc9;
+  --panel-soft: #e5d5bf;
+  --stroke: #cfbea5;
+  --text: #2f2720;
+  --text-soft: #6f5f50;
+  --accent: #be7d5d;
+  --accent-ink: #fff6f1;
+  --success: #3d8f73;
+  --danger: #bc5f53;
+}
+
+body[data-theme-pack="inkwell"] {
+  --bg: #111419;
+  --panel: #171c24;
+  --panel-soft: #1d2430;
+  --stroke: #2d3748;
+  --text: #d6dceb;
+  --text-soft: #93a0bb;
+  --accent: #7d94d1;
+  --accent-ink: #0f1423;
+  --success: #72c3b0;
+  --danger: #ef8d98;
+}
+
+body[data-theme-pack="dawn"] {
+  --bg: #f4f2f8;
+  --panel: #ece8f3;
+  --panel-soft: #e4deef;
+  --stroke: #cfc7dd;
+  --text: #2f2a39;
+  --text-soft: #6e6383;
+  --accent: #8d77c8;
+  --accent-ink: #f7f3ff;
+  --success: #3e8e7a;
+  --danger: #b65f7c;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--bg) 94%, #000), var(--bg));
+}
+
+.title-font {
+  font-family: var(--font-title);
+}
+
+.surface {
+  border: 1px solid var(--stroke);
+  background: var(--panel);
+  border-radius: 0.85rem;
+}
+
+.surface-soft {
+  border: 1px solid var(--stroke);
+  background: var(--panel-soft);
+  border-radius: 0.85rem;
+}
+
+.chip-btn {
+  border: 1px solid var(--stroke);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 0.6rem;
+  transition: 140ms ease;
+}
+
+.chip-btn:hover {
+  border-color: color-mix(in oklab, var(--accent) 70%, var(--stroke));
+}
+
+.chip-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.primary-btn {
+  border: 1px solid color-mix(in oklab, var(--accent) 72%, #000);
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-radius: 0.65rem;
+  font-weight: 700;
+}
+
+.ghost-btn {
+  border: 1px solid var(--stroke);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 0.65rem;
+  font-weight: 700;
+}
+
+.mode-card {
+  border: 1px solid var(--stroke);
+  border-radius: 0.8rem;
+  background: var(--panel);
+  transition: 140ms ease;
+}
+
+.mode-card:hover {
+  border-color: color-mix(in oklab, var(--accent) 70%, var(--stroke));
+}
+
+.mode-card.active {
+  border-color: var(--accent);
+}
