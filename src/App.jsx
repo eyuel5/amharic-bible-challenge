@@ -5,6 +5,7 @@ import GameSettingsScreen from "./components/game/layouts/GameSettingsScreen"
 import GameSetupScreen from "./components/game/layouts/GameSetupScreen"
 import BookOrderGame from "./components/game/modes/BookOrder"
 import VerseRecallGame from "./components/game/modes/VerseRecall"
+import VerseSpeakerGame from "./components/game/modes/VerseSpeaker"
 import VerseToBookGame from "./components/game/modes/VerseToBook"
 import { getAllBooks, validateBooksCatalog } from "./services/bibleService"
 
@@ -29,6 +30,13 @@ const modes = [
     description: "Choose the next Bible book in sequence.",
     Component: BookOrderGame,
     allowSingleBookSource: false,
+  },
+  {
+    id: "verse-speaker",
+    label: "Verse Speaker",
+    description: "Identify who said the verse from narrative books.",
+    Component: VerseSpeakerGame,
+    allowSingleBookSource: true,
   },
 ]
 

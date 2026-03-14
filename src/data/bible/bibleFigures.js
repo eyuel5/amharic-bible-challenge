@@ -205,6 +205,7 @@ export const BIBLE_FIGURES = [
 { "id": "andrew", "name": "እንድርያስ", "aliases": ["እንድርያስ"], "books": ["mat", "mar", "luk", "jhn"], "tags": ["apostle", "speaker"] },
 { "id": "philip_apostle", "name": "ፊልጶስ", "aliases": ["ፊልጶስ"], "books": ["mat", "mar", "luk", "jhn"], "tags": ["apostle", "speaker"] },
 { "id": "bartholomew", "name": "በርተሎሜዎስ", "aliases": ["በርተሎሜዎስ"], "books": ["mat", "mar", "luk"], "tags": ["apostle"] },
+{ "id": "nathanael", "name": "ናትናኤል", "aliases": ["ናትናኤል"], "books": ["jhn"], "tags": ["apostle", "speaker"] },
 { "id": "thomas", "name": "ቶማስ", "aliases": ["ቶማስ"], "books": ["mat", "mar", "luk", "jhn"], "tags": ["apostle", "speaker"] },
 { "id": "matthew", "name": "ማቴዎስ", "aliases": ["ማቴዎስ"], "books": ["mat"], "tags": ["apostle", "speaker"] },
 { "id": "thaddaeus", "name": "ታዴዎስ", "aliases": ["ታዴዎስ"], "books": ["mat", "mar"], "tags": ["apostle"] },
