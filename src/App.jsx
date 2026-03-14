@@ -3,6 +3,8 @@ import { Settings } from "lucide-react"
 import GameResultsScreen from "./components/game/GameResultsScreen"
 import GameSettingsPanel from "./components/game/GameSettingsPanel"
 import GameSetupScreen from "./components/game/GameSetupScreen"
+import BookOrderGame from "./components/game/BookOrderGame"
+import VerseRecallGame from "./components/game/VerseRecallGame"
 import VerseToBookGame from "./components/game/VerseToBookGame"
 import { getAllBooks, validateBooksCatalog } from "./services/bibleService"
 
@@ -12,6 +14,20 @@ const modes = [
     label: "Verse to Book",
     description: "Read a verse and choose the correct book.",
     Component: VerseToBookGame,
+    allowSingleBookSource: false,
+  },
+  {
+    id: "verse-recall",
+    label: "Verse Recall",
+    description: "Fill in the missing word from a verse.",
+    Component: VerseRecallGame,
+    allowSingleBookSource: true,
+  },
+  {
+    id: "book-order",
+    label: "Book Order",
+    description: "Choose the next Bible book in sequence.",
+    Component: BookOrderGame,
     allowSingleBookSource: false,
   },
 ]
