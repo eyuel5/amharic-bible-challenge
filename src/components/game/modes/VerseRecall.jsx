@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { getAllBooks, getRandomVerse, loadBookById } from "../../services/bibleService"
+import { getAllBooks, getRandomVerse, loadBookById } from "../../../services/bibleService"
 
 const allBooks = getAllBooks()
 const fallbackDistractors = ["እግዚአብሔር", "ፍቅር", "ሕይወት", "ሰላም", "እምነት", "ቃል", "ጸጋ"]

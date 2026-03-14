@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react"
 import { Settings } from "lucide-react"
-import GameResultsScreen from "./components/game/GameResultsScreen"
-import GameSettingsPanel from "./components/game/GameSettingsPanel"
-import GameSetupScreen from "./components/game/GameSetupScreen"
-import BookOrderGame from "./components/game/BookOrderGame"
-import VerseRecallGame from "./components/game/VerseRecallGame"
-import VerseToBookGame from "./components/game/VerseToBookGame"
+import GameResultsScreen from "./components/game/layouts/GameResultsScreen"
+import GameSettingsScreen from "./components/game/layouts/GameSettingsScreen"
+import GameSetupScreen from "./components/game/layouts/GameSetupScreen"
+import BookOrderGame from "./components/game/modes/BookOrder"
+import VerseRecallGame from "./components/game/modes/VerseRecall"
+import VerseToBookGame from "./components/game/modes/VerseToBook"
 import { getAllBooks, validateBooksCatalog } from "./services/bibleService"
 
 const modes = [
@@ -166,7 +166,7 @@ function App() {
 
         {stage === "settings" && (
           <section className="mt-8 space-y-4">
-            <GameSettingsPanel themePack={themePack} onThemePackChange={setThemePack} />
+            <GameSettingsScreen themePack={themePack} onThemePackChange={setThemePack} />
             <button type="button" onClick={closeSettings} className="ghost-btn px-5 py-3 text-sm">
               Back
             </button>

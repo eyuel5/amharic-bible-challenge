@@ -10,7 +10,7 @@ const themes = [
   { id: "dawn", label: "Dawn", swatch: ["#f4f2f8", "#8d77c8", "#2f2a39"] },
 ]
 
-export default function GameSettingsPanel({ themePack, onThemePackChange }) {
+export default function GameSettingsScreen({ themePack, onThemePackChange }) {
   return (
     <div className="surface min-w-[290px] space-y-3 p-3">
       <div>

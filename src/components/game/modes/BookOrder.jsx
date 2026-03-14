@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { getAllBooks } from "../../services/bibleService"
+import { getAllBooks } from "../../../services/bibleService"
 
 const allBooks = getAllBooks()
 
