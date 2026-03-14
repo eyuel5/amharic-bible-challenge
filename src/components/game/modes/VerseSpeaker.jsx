@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { collectSpeakerQuotes } from "../../../services/SpeakerExtraction"
+import { BIBLE_FIGURES } from "../../../data/bible/bibleFigures"
 
 function shuffle(items) {
   const next = [...items]
@@ -42,9 +43,13 @@ function pickQuestionOrder(pool, questionCount) {
 function buildQuestions(pool, questionCount) {
   const selections = pickQuestionOrder(pool, questionCount)
   const uniqueSpeakers = [...new Set(pool.map((item) => item.speaker).filter(Boolean))]
+  const fallbackSpeakers = [...new Set(BIBLE_FIGURES.map((figure) => figure.name).filter(Boolean))]
 
   return selections.map((item) => {
-    const distractors = shuffle(uniqueSpeakers.filter((name) => name !== item.speaker)).slice(0, 3)
+    const basePool = uniqueSpeakers.filter((name) => name !== item.speaker)
+    const extraPool = fallbackSpeakers.filter((name) => name !== item.speaker && !basePool.includes(name))
+    const combinedPool = [...basePool, ...extraPool]
+    const distractors = shuffle(combinedPool).slice(0, 3)
     const options = shuffle([item.speaker, ...distractors])
     return { ...item, options }
   })
