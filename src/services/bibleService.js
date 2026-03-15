@@ -1,5 +1,5 @@
-import { books } from "../data/bible/books.meta"
-import { validateBibleBook, validateBookMeta } from "../data/schema/bibleSchema"
+import { books } from "../data/bible/books.meta.js"
+import { validateBibleBook, validateBookMeta } from "../data/schema/bibleSchema.js"
 
 const bibleBookModules = import.meta.glob("../data/bible/books/*.json")
 const bibleBookLoadersByFile = Object.fromEntries(

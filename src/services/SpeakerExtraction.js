@@ -1,5 +1,4 @@
-import { BIBLE_FIGURES } from "../data/bible/bibleFigures"
-import { getAllBooks, loadBookById } from "./bibleService"
+import { BIBLE_FIGURES } from "../data/bible/bibleFigures.js"
 
 export const NARRATIVE_SPEECH_BOOKS = [
   "gen",
@@ -55,7 +54,7 @@ const FULL_STOP = "።"
 const QUESTION_MARK = "?"
 const SPEECH_VERB_SET = new Set(SPEECH_VERBS)
 const ENDING_VERB_SET = new Set(ENDING_SPEECH_VERBS)
-const GROUP_ENDING_VERBS = new Set(["አሉ", "ተናገሩ", "መለሱ"])
+const GROUP_ENDING_VERBS = new Set(["አሉ", "ተናገሩ", "መለሱ", "መለሱለት"])
 const PUNCTUATION_CLASS = PUNCTUATIONS.map((char) => `\\${char}`).join("")
 
 const EXTRA_SPEAKER_ENTRIES = [
@@ -71,6 +70,10 @@ const EXTRA_SPEAKER_ENTRIES = [
 const figureById = new Map(
   [...BIBLE_FIGURES, ...EXTRA_SPEAKER_ENTRIES].map((figure) => [figure.id, figure]),
 )
+const figureByName = new Map(
+  [...BIBLE_FIGURES, ...EXTRA_SPEAKER_ENTRIES].map((figure) => [figure.name, figure]),
+)
+const JESUS_NAME = figureById.get("jesus")?.name ?? "ኢየሱስ"
 
 const figureAliasIndex = [...BIBLE_FIGURES, ...EXTRA_SPEAKER_ENTRIES].flatMap((figure) => {
   const aliases = Array.isArray(figure.aliases) && figure.aliases.length > 0 ? figure.aliases : [figure.name]
@@ -91,6 +94,8 @@ const aliasToIds = figureAliasIndex.reduce((map, entry) => {
 }, new Map())
 
 const aliasesByBookId = new Map()
+const GOSPEL_BOOKS = new Set(["mat", "mrk", "luk", "jhn"])
+const APOSTLE_TAGS = new Set(["apostle", "disciple"])
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
@@ -121,6 +126,28 @@ function hasIntroPronoun(text) {
   return tokens.some((token) => INTRO_PRONOUNS.includes(token))
 }
 
+function hasToken(text, target) {
+  if (!text || !target) return false
+  const tokens = text.split(/\s+/).map((token) => stripEdgePunctuation(token))
+  return tokens.includes(target)
+}
+
+function isFigureTaggedByName(name, tagSet) {
+  if (!name) return false
+  const figure = figureByName.get(name)
+  if (!figure || !Array.isArray(figure.tags)) return false
+  return figure.tags.some((tag) => tagSet.has(tag))
+}
+
+function hasTaggedMention(text, aliasEntries, bookId, tagSet) {
+  const matches = findAliasMatches(text, aliasEntries, bookId)
+  return matches.some((match) => {
+    const entry = figureById.get(match.id)
+    if (!entry || !Array.isArray(entry.tags)) return false
+    return entry.tags.some((tag) => tagSet.has(tag))
+  })
+}
+
 function endsWithIntroPronounSegment(segment) {
   const cleaned = segment.trim()
   if (!cleaned) return false
@@ -128,6 +155,15 @@ function endsWithIntroPronounSegment(segment) {
   if (tokens.length === 0) return false
   const lastToken = stripEdgePunctuation(tokens[tokens.length - 1])
   return INTRO_PRONOUNS.includes(lastToken)
+}
+
+function startsWithIntroPronounSegment(segment) {
+  const cleaned = segment.trim()
+  if (!cleaned) return false
+  const tokens = cleaned.split(/\s+/).filter(Boolean)
+  if (tokens.length === 0) return false
+  const firstToken = stripEdgePunctuation(tokens[0])
+  return INTRO_PRONOUNS.includes(firstToken)
 }
 
 function isAliasAllowed(entry, bookId) {
@@ -159,7 +195,14 @@ function findAliasMatches(segment, aliasEntries, bookId, options = {}) {
   aliasEntries.forEach((entry) => {
     if (!isAliasAllowed(entry, bookId)) return
     if (requireGroup && !isGroupFigure(entry.id)) return
-    const variants = [entry.alias, `${entry.alias}ም`, `${entry.alias}ን`, `${entry.alias}ንም`]
+    const variants = [
+      entry.alias,
+      `${entry.alias}ም`,
+      `${entry.alias}ን`,
+      `${entry.alias}ንም`,
+      `${entry.alias}ና`,
+      `${entry.alias}ናም`,
+    ]
     variants.forEach((variant) => {
       const pattern = new RegExp(
         `(^|\\s|[${PUNCTUATION_CLASS}])(${escapeRegExp(variant)})(?=\\s|$|[${PUNCTUATION_CLASS}])`,
@@ -174,6 +217,10 @@ function findAliasMatches(segment, aliasEntries, bookId, options = {}) {
             ? "ም"
             : text.endsWith("ን")
               ? "ን"
+              : text.endsWith("ናም")
+                ? "ናም"
+                : text.endsWith("ና")
+                  ? "ና"
               : ""
         matches.push({
           id: entry.id,
@@ -208,6 +255,31 @@ function findPrimarySpeakerInText(text, aliasEntries, bookId, options = {}) {
   const matches = findAliasMatches(text, aliasEntries, bookId, options)
   if (matches.length === 0) return null
   return matches[0].speaker
+}
+
+function findListenerFromSegment(segment, aliasEntries, bookId, options = {}) {
+  const trimmed = segment.trim()
+  if (!trimmed) return null
+
+  const requireGroup = Boolean(options.requireGroup)
+  const matches = findAliasMatches(trimmed, aliasEntries, bookId, { requireGroup })
+  if (matches.length === 0) return null
+
+  const listenerMatch = [...matches]
+    .reverse()
+    .find((match) => match.suffix === "ን" || match.suffix === "ንም")
+
+  return listenerMatch ? listenerMatch.speaker : null
+}
+
+function findPriorListener(parts, startIndex, aliasEntries, bookId, options = {}) {
+  for (let i = startIndex; i >= 0; i -= 1) {
+    const segment = parts[i]?.trim()
+    if (!segment) continue
+    const listener = findListenerFromSegment(segment, aliasEntries, bookId, options)
+    if (listener) return listener
+  }
+  return null
 }
 
 function resolveEndingVerbSegment(
@@ -299,13 +371,13 @@ function resolveSpeakerFromSegment(segment, aliasEntries, bookId) {
   if (matches.length >= 2) {
     const second = matches[matches.length - 1]
     const first = matches[matches.length - 2]
-    if (first.suffix === "ም" && second.suffix === "ን" && second.end === trimmed.length) {
+    if (first.suffix === "ም" && (second.suffix === "ን" || second.suffix === "ንም") && second.end === trimmed.length) {
       return { speaker: first.speaker, listener: second.speaker }
     }
   }
 
   // Rule 1/2: name or name+ም immediately before ።
-  if (lastMatch.end === trimmed.length && lastMatch.suffix !== "ን") {
+  if (lastMatch.end === trimmed.length && lastMatch.suffix !== "ን" && lastMatch.suffix !== "ንም") {
     return { speaker: lastMatch.speaker, listener: null }
   }
 
@@ -315,7 +387,7 @@ function resolveSpeakerFromSegment(segment, aliasEntries, bookId) {
     const verbIndex = trimmed.lastIndexOf(lastToken.raw)
     const priorMatch = [...matches]
       .reverse()
-      .find((match) => match.end <= verbIndex && match.suffix !== "ን")
+      .find((match) => match.end <= verbIndex && match.suffix !== "ን" && match.suffix !== "ንም")
     if (priorMatch) {
       return { speaker: priorMatch.speaker, listener: null }
     }
@@ -342,6 +414,9 @@ function buildQuoteFromParts(parts, startIndex) {
       } else {
         const nextPart = parts[startIndex + usedParts]?.trim()
         if (nextPart) {
+          if (startsWithIntroPronounSegment(nextPart)) {
+            return quote
+          }
           const nextQuestion = nextPart.indexOf(QUESTION_MARK)
           if (nextQuestion !== -1) {
             quote = `${quote} ${FULL_STOP} ${nextPart.slice(0, nextQuestion + 1).trim()}`
@@ -358,6 +433,9 @@ function buildQuoteFromParts(parts, startIndex) {
   if (countWords(quote) <= 2) {
     const nextPart = parts[startIndex + usedParts]?.trim()
     if (nextPart) {
+      if (startsWithIntroPronounSegment(nextPart)) {
+        return quote
+      }
       quote = `${quote} ${FULL_STOP} ${nextPart}`
     }
   }
@@ -365,6 +443,9 @@ function buildQuoteFromParts(parts, startIndex) {
   if (countWords(quote) <= 4) {
     const remaining = parts.slice(startIndex + usedParts).join(FULL_STOP)
     if (remaining) {
+      if (startsWithIntroPronounSegment(remaining)) {
+        return quote
+      }
       const extra = buildQuoteUntilPunctuation(remaining, 0)
       if (extra) {
         quote = `${quote} ${FULL_STOP} ${extra}`
@@ -399,7 +480,12 @@ function buildQuoteUntilPunctuation(text, startIndex) {
 export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
   if (!verseText) return []
   const aliasEntries = getAliasesForBook(bookId)
+  const trimmedVerse = verseText.trim()
+  const endsWithTerminal = trimmedVerse.endsWith(FULL_STOP) || trimmedVerse.endsWith(QUESTION_MARK)
   const parts = verseText.split(FULL_STOP)
+  if (options.continuationText && !endsWithTerminal) {
+    parts.push(options.continuationText)
+  }
   const results = []
   const candidates = []
 
@@ -408,11 +494,32 @@ export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
     if (!segment) continue
 
     if (endsWithIntroPronounSegment(segment)) {
+      const priorGroupListener =
+        index > 0 ? findPriorListener(parts, index - 1, aliasEntries, bookId, { requireGroup: true }) : null
+      const priorListener = index > 0 ? findPriorListener(parts, index - 1, aliasEntries, bookId) : null
       const remaining = parts.slice(index + 1).join(FULL_STOP)
       const quote = buildQuoteUntilPunctuation(remaining, 0)
       if (quote) {
-        const speaker =
-          index > 0 ? options.fallbackAltSpeaker ?? options.fallbackSpeaker : options.fallbackSpeaker
+        let speaker =
+          priorGroupListener ??
+          priorListener ??
+          (index > 0 ? options.fallbackAltSpeaker ?? options.fallbackSpeaker : options.fallbackSpeaker)
+
+        const priorText = options.priorVerseText ?? ""
+        const priorSaidToHim = hasToken(priorText, "አሉት")
+        if (priorSaidToHim && options.fallbackSpeaker && (!speaker || speaker === options.fallbackAltSpeaker)) {
+          speaker = options.fallbackSpeaker
+        }
+        const shouldPreferJesus =
+          GOSPEL_BOOKS.has(bookId) &&
+          hasToken(priorText, "አሉት") &&
+          hasTaggedMention(priorText, aliasEntries, bookId, APOSTLE_TAGS) &&
+          hasToken(verseText, "አላቸው")
+
+        if (shouldPreferJesus && (!speaker || isFigureTaggedByName(speaker, APOSTLE_TAGS))) {
+          speaker = JESUS_NAME
+        }
+
         candidates.push({
           speaker: speaker ?? null,
           listener: null,
@@ -484,6 +591,7 @@ function shuffle(items) {
 }
 
 export async function collectSpeakerQuotes({ sourceScope, sourceBookId, maxQuotes = 10 }) {
+  const { getAllBooks, loadBookById } = await import("./bibleService.js")
   const allBooks = getAllBooks()
   let candidateBooks = allBooks.filter((book) => NARRATIVE_SPEECH_BOOKS.includes(book.id))
 
@@ -540,11 +648,15 @@ export async function collectSpeakerQuotes({ sourceScope, sourceBookId, maxQuote
           lastGroupSpeaker = verseGroupSpeaker
         }
 
+        const nextVerseText = chapter.verses[verseIndex + 1]
+        const priorVerseText = chapter.verses[verseIndex - 1]
         const quotes = extractSpeakerQuotesFromVerse(text, book.id, {
           fallbackSpeaker: lastSpeaker,
           fallbackAltSpeaker: lastAltSpeaker,
           fallbackGroupSpeaker: lastGroupSpeaker,
           fallbackAltGroupSpeaker: lastAltGroupSpeaker,
+          continuationText: nextVerseText ?? "",
+          priorVerseText: priorVerseText ?? "",
         })
         quotes.forEach((quote) => {
           if (results.length >= maxQuotes) return
