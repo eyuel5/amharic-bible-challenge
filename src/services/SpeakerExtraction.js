@@ -58,10 +58,21 @@ const ENDING_VERB_SET = new Set(ENDING_SPEECH_VERBS)
 const GROUP_ENDING_VERBS = new Set(["አሉ", "ተናገሩ", "መለሱ"])
 const PUNCTUATION_CLASS = PUNCTUATIONS.map((char) => `\\${char}`).join("")
 
-const figureById = new Map(BIBLE_FIGURES.map((figure) => [figure.id, figure]))
+const EXTRA_SPEAKER_ENTRIES = [
+  {
+    id: "the_lord",
+    name: "እግዚአብሔር",
+    aliases: ["እግዚአብሔር"],
+    books: [],
+    tags: ["speaker"],
+  },
+]
 
+const figureById = new Map(
+  [...BIBLE_FIGURES, ...EXTRA_SPEAKER_ENTRIES].map((figure) => [figure.id, figure]),
+)
 
-const figureAliasIndex = BIBLE_FIGURES.flatMap((figure) => {
+const figureAliasIndex = [...BIBLE_FIGURES, ...EXTRA_SPEAKER_ENTRIES].flatMap((figure) => {
   const aliases = Array.isArray(figure.aliases) && figure.aliases.length > 0 ? figure.aliases : [figure.name]
   return aliases.map((alias) => ({
     id: figure.id,
@@ -235,6 +246,7 @@ function resolveEndingVerbSegment(
   }
 
   const speechAfterMarker = /\b(እንዲህ|እንዲሁ|እንዲህም|እንዲሁም)\b/u.test(trimmed)
+  const speechIntroMarker = /\b(ብሎ|ብለው|ብላ|ብለች|ይላል|ትላለች|ይላሉ|ትላሉ)\b/u.test(trimmed)
   const introPronounMarker = hasIntroPronoun(trimmed)
 
   if (speechAfterMarker) {
@@ -258,6 +270,10 @@ function resolveEndingVerbSegment(
       speaker: inferredSpeaker ?? fallback ?? null,
       listener: null,
     }
+  }
+
+  if (!speechIntroMarker && !introPronounMarker) {
+    return null
   }
 
   return {
@@ -343,6 +359,16 @@ function buildQuoteFromParts(parts, startIndex) {
     const nextPart = parts[startIndex + usedParts]?.trim()
     if (nextPart) {
       quote = `${quote} ${FULL_STOP} ${nextPart}`
+    }
+  }
+
+  if (countWords(quote) <= 4) {
+    const remaining = parts.slice(startIndex + usedParts).join(FULL_STOP)
+    if (remaining) {
+      const extra = buildQuoteUntilPunctuation(remaining, 0)
+      if (extra) {
+        quote = `${quote} ${FULL_STOP} ${extra}`
+      }
     }
   }
 
@@ -472,6 +498,8 @@ export async function collectSpeakerQuotes({ sourceScope, sourceBookId, maxQuote
   const results = []
   const shuffledBooks = shuffle(candidateBooks)
   const maxVersesPerBook = 350
+  const maxPerBook = Math.max(4, Math.ceil(maxQuotes / 3))
+  const countsByBook = new Map()
 
   for (const book of shuffledBooks) {
     if (results.length >= maxQuotes) break
@@ -520,6 +548,8 @@ export async function collectSpeakerQuotes({ sourceScope, sourceBookId, maxQuote
         })
         quotes.forEach((quote) => {
           if (results.length >= maxQuotes) return
+          const currentCount = countsByBook.get(book.id) ?? 0
+          if (currentCount >= maxPerBook && shuffledBooks.length > 1) return
           results.push({
             ...quote,
             bookId: book.id,
@@ -527,10 +557,11 @@ export async function collectSpeakerQuotes({ sourceScope, sourceBookId, maxQuote
             chapter: chapter.chapter,
             verseNumber: verseIndex + 1,
           })
+          countsByBook.set(book.id, currentCount + 1)
         })
       }
     }
   }
 
-  return results
+  return shuffle(results)
 }
