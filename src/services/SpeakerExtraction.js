@@ -96,6 +96,54 @@ const aliasToIds = figureAliasIndex.reduce((map, entry) => {
 const aliasesByBookId = new Map()
 const GOSPEL_BOOKS = new Set(["mat", "mrk", "luk", "jhn"])
 const APOSTLE_TAGS = new Set(["apostle", "disciple"])
+const JOB_CHAPTER_SPEAKERS = new Map([
+  [3, "ኢዮብ"],
+  [4, "ኤልፋዝ"],
+  [5, "ኤልፋዝ"],
+  [6, "ኢዮብ"],
+  [7, "ኢዮብ"],
+  [8, "በልዳዶስ"],
+  [9, "ኢዮብ"],
+  [10, "ኢዮብ"],
+  [11, "ሶፋር"],
+  [12, "ኢዮብ"],
+  [13, "ኢዮብ"],
+  [14, "ኢዮብ"],
+  [15, "ኤልፋዝ"],
+  [16, "ኢዮብ"],
+  [17, "ኢዮብ"],
+  [18, "በልዳዶስ"],
+  [19, "ኢዮብ"],
+  [20, "ሶፋር"],
+  [21, "ኢዮብ"],
+  [22, "ኤልፋዝ"],
+  [23, "ኢዮብ"],
+  [24, "ኢዮብ"],
+  [25, "በልዳዶስ"],
+  [26, "ኢዮብ"],
+  [27, "ኢዮብ"],
+  [28, "ኢዮብ"],
+  [29, "ኢዮብ"],
+  [30, "ኢዮብ"],
+  [31, "ኢዮብ"],
+  [32, "ኤሊሁ"],
+  [33, "ኤሊሁ"],
+  [34, "ኤሊሁ"],
+  [35, "ኤሊሁ"],
+  [36, "ኤሊሁ"],
+  [37, "ኤሊሁ"],
+  [38, "እግዚአብሔር"],
+  [39, "እግዚአብሔር"],
+  [40, "እግዚአብሔር"],
+  [41, "እግዚአብሔር"],
+])
+
+function getJobChapterSpeaker(chapterNumber) {
+  if (!chapterNumber) return null
+  const num = Number(chapterNumber)
+  if (!Number.isFinite(num)) return null
+  return JOB_CHAPTER_SPEAKERS.get(num) ?? null
+}
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
@@ -122,6 +170,15 @@ function stripEdgePunctuation(text) {
 
 function countWords(text) {
   return text.trim().split(/\s+/).filter(Boolean).length
+}
+
+function isLikelyIntroOnly(text) {
+  if (!text) return false
+  const trimmed = text.trim()
+  if (trimmed.length === 0) return false
+  const tokens = trimmed.split(/\s+/).filter(Boolean).map((token) => stripEdgePunctuation(token))
+  const hasSpeechVerb = tokens.some((token) => ENDING_VERB_SET.has(token) || SPEECH_VERB_SET.has(token))
+  return hasSpeechVerb && countWords(trimmed) <= 6 && !trimmed.includes(QUESTION_MARK)
 }
 
 function hasIntroPronoun(text) {
@@ -556,6 +613,7 @@ export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
   }
   const results = []
   const candidates = []
+  const forcedSpeaker = options.forcedSpeaker ?? null
 
   for (let index = 0; index < parts.length - 1; index += 1) {
     const segment = parts[index]?.trim()
@@ -607,7 +665,7 @@ export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
         }
 
         candidates.push({
-          speaker: speaker ?? null,
+          speaker: forcedSpeaker ?? speaker ?? null,
           listener: null,
           quote,
           rank: 3,
@@ -634,7 +692,7 @@ export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
           : buildQuoteFromParts(parts, index + 1)
       if (!quote) continue
       candidates.push({
-        speaker: endingVerbInfo.speaker,
+        speaker: forcedSpeaker ?? endingVerbInfo.speaker,
         listener: endingVerbInfo.listener ?? null,
         quote,
         rank: endingVerbInfo.mode === "before" ? 1 : 2,
@@ -650,7 +708,7 @@ export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
     if (!quote) continue
 
     candidates.push({
-      speaker: speakerInfo.speaker,
+      speaker: forcedSpeaker ?? speakerInfo.speaker,
       listener: speakerInfo.listener ?? null,
       quote,
       rank: 4,
@@ -658,6 +716,20 @@ export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
     })
   }
 
+  if (forcedSpeaker && candidates.length === 0) {
+    if (!isLikelyIntroOnly(trimmedVerse)) {
+      return [
+        {
+          speaker: forcedSpeaker,
+          listener: null,
+          quote: trimmedVerse,
+          rank: 0,
+          order: 0,
+        },
+      ]
+    }
+    return []
+  }
   if (candidates.length === 0) return []
 
   const earliestOrder = Math.min(...candidates.map((item) => item.order))
@@ -739,6 +811,8 @@ export async function collectSpeakerQuotes({ sourceScope, sourceBookId, maxQuote
         const priorVerseText = [chapter.verses[verseIndex - 2], chapter.verses[verseIndex - 1]]
           .filter(Boolean)
           .join(" ")
+        const forcedSpeaker =
+          book.id === "job" && Number(chapter.chapter) >= 3 ? getJobChapterSpeaker(chapter.chapter) : null
         const quotes = extractSpeakerQuotesFromVerse(text, book.id, {
           fallbackSpeaker: lastSpeaker,
           fallbackAltSpeaker: lastAltSpeaker,
@@ -746,6 +820,7 @@ export async function collectSpeakerQuotes({ sourceScope, sourceBookId, maxQuote
           fallbackAltGroupSpeaker: lastAltGroupSpeaker,
           continuationText: nextVerseText ?? "",
           priorVerseText: priorVerseText ?? "",
+          forcedSpeaker,
         })
         quotes.forEach((quote) => {
           if (results.length >= maxQuotes) return
