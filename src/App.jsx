@@ -128,14 +128,16 @@ function App() {
               A focused Bible quiz experience with purposeful modes and session-based play.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={openSettings}
-            className="chip-btn inline-flex h-11 w-11 items-center justify-center self-start"
-            aria-label="Open settings"
-          >
-            <Settings size={18} />
-          </button>
+          {(stage === "setup" || stage === "results") && (
+            <button
+              type="button"
+              onClick={openSettings}
+              className="chip-btn inline-flex h-11 w-11 items-center justify-center self-start"
+              aria-label="Open settings"
+            >
+              <Settings size={18} />
+            </button>
+          )}
         </header>
 
         {stage === "setup" && (
