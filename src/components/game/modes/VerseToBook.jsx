@@ -128,12 +128,12 @@ export default function VerseToBookGame({ questionCount, sourceScope, sourceBook
       </div>
 
       <div className="surface-soft mt-6 p-5">
-        {loading && <p className="text-[var(--text-soft)]">Preparing question...</p>}
+        {loading && <p className="text-[var(--text-soft)]">{labels.preparingQuestion}</p>}
         {!loading && error && <p className="text-[var(--danger)]">{error}</p>}
 
         {!loading && !error && currentQuestion && (
           <>
-            <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">Which book is this verse from?</p>
+            <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">{labels.whichBookPrompt}</p>
             <p className="mt-3 rounded-lg border border-[var(--stroke)] bg-[var(--panel)] p-4 text-base leading-7 text-[var(--text)]">
               "{currentQuestion.prompt}"
             </p>
@@ -170,8 +170,8 @@ export default function VerseToBookGame({ questionCount, sourceScope, sourceBook
                   {answerResult === "correct" ? labels.correct : labels.notCorrect}
                 </p>
                 <p className="mt-2 text-[var(--text-soft)]">
-                  {labels.answerLabel}: {currentQuestion.answerBookName} (Chapter {currentQuestion.answerChapter}, Verse{" "}
-                  {currentQuestion.answerVerseNumber})
+                  {labels.answerLabel}: {currentQuestion.answerBookName} {currentQuestion.answerChapter}:
+                  {currentQuestion.answerVerseNumber}
                 </p>
                 {round >= questionCount ? (
                   <button

@@ -206,12 +206,12 @@ export default function VerseRecallGame({ questionCount, sourceScope, sourceBook
       </div>
 
       <div className="surface-soft mt-6 p-5">
-        {loading && <p className="text-[var(--text-soft)]">Preparing question...</p>}
+        {loading && <p className="text-[var(--text-soft)]">{labels.preparingQuestion}</p>}
         {!loading && error && <p className="text-[var(--danger)]">{error}</p>}
 
         {!loading && !error && currentQuestion && (
           <>
-            <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">Complete the missing word</p>
+            <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">{labels.completeMissingWord}</p>
             <p className="mt-3 rounded-lg border border-[var(--stroke)] bg-[var(--panel)] p-4 text-base leading-7 text-[var(--text)]">
               "{currentQuestion.prompt}"
             </p>

@@ -143,15 +143,21 @@ export default function BookOrderGame({ questionCount, sourceScope, onComplete, 
       </div>
 
       <div className="surface-soft mt-6 p-5">
-        {loading && <p className="text-[var(--text-soft)]">Preparing question...</p>}
+        {loading && <p className="text-[var(--text-soft)]">{labels.preparingQuestion}</p>}
         {!loading && error && <p className="text-[var(--danger)]">{error}</p>}
 
         {!loading && !error && currentQuestion && (
           <>
-            <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">Book Order</p>
+            <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">{labels.bookOrderTitle}</p>
             <p className="mt-3 text-base text-[var(--text)]">
-              Which book comes <span className="font-semibold">{currentQuestion.direction}</span>{" "}
-              <span className="font-semibold">{currentQuestion.promptBook.nameAm}</span>?
+              {currentQuestion.direction === "after" ? labels.comesAfterPrefix : labels.comesBeforePrefix}{" "}
+              <span className="font-semibold">{currentQuestion.promptBook.nameAm}</span>
+              {(() => {
+                const suffix =
+                  currentQuestion.direction === "after" ? labels.comesAfterSuffix : labels.comesBeforeSuffix
+                const spacer = suffix.startsWith("?") ? "" : " "
+                return `${spacer}${suffix}`
+              })()}
             </p>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">

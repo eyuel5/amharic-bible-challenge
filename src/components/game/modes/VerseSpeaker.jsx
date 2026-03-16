@@ -177,12 +177,12 @@ export default function VerseSpeakerGame({ questionCount, sourceScope, sourceBoo
       </div>
 
       <div className="surface-soft mt-6 p-5">
-        {loading && <p className="text-[var(--text-soft)]">Preparing speaker question...</p>}
+        {loading && <p className="text-[var(--text-soft)]">{labels.preparingQuestion}</p>}
         {!loading && error && <p className="text-[var(--danger)]">{error}</p>}
 
         {!loading && !error && currentQuestion && (
           <>
-            <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">Who said this?</p>
+            <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">{labels.whoSaidThis}</p>
             <p className="mt-3 rounded-lg border border-[var(--stroke)] bg-[var(--panel)] p-4 text-base leading-7 text-[var(--text)]">
               "{currentQuestion.quote}"
             </p>
@@ -223,7 +223,9 @@ export default function VerseSpeakerGame({ questionCount, sourceScope, sourceBoo
                   {currentQuestion.verseNumber})
                 </p>
                 {currentQuestion.listener && (
-                  <p className="mt-2 text-[var(--text-soft)]">Listener: {currentQuestion.listener}</p>
+                  <p className="mt-2 text-[var(--text-soft)]">
+                    {labels.listenerLabel}: {currentQuestion.listener}
+                  </p>
                 )}
                 {currentIndex + 1 >= totalQuestions ? (
                   <button

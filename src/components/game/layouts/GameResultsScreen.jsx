@@ -23,18 +23,31 @@ export default function GameResultsScreen({ result, onPlayAgain, onBackToSetup, 
         </h2>
 
         <p className="mt-4 text-sm text-[var(--text)]">
-          <span className="font-semibold">Score:</span> {result.score}/{result.round}
+          <span className="font-semibold">{labels.scoreLabel}:</span> {result.score}/{result.round}
           <span className="mx-2 text-[var(--text-soft)]">•</span>
-          <span className="font-semibold">Mode:</span> {result.modeLabel}
+          <span className="font-semibold">{labels.modeLabel}:</span>{" "}
+          {(() => {
+            const modeKeyMap = {
+              "verse-to-book": "verseToBook",
+              "verse-recall": "verseRecall",
+              "book-order": "bookOrder",
+              "verse-speaker": "verseSpeaker",
+            }
+            const key = modeKeyMap[result.modeId]
+            return key && labels.modes?.[key]?.label ? labels.modes[key].label : result.modeLabel
+          })()}
           <span className="mx-2 text-[var(--text-soft)]">•</span>
-          <span className="font-semibold">Source:</span> {result.sourceLabel ?? "All"}
+          <span className="font-semibold">{labels.sourceLabel}:</span>{" "}
+          {result.sourceScope === "single"
+            ? result.sourceLabel ?? labels.singleBook
+            : labels.sources?.[result.sourceScope] ?? result.sourceLabel ?? labels.sources.all}
         </p>
 
         {(durationLabel || result.best || result.last) && (
           <p className="mt-2 text-sm text-[var(--text-soft)]">
             {durationLabel && (
               <>
-                <span className="font-semibold text-[var(--text)]">Time:</span> {durationLabel}
+                <span className="font-semibold text-[var(--text)]">{labels.timeLabel}:</span> {durationLabel}
               </>
             )}
             {durationLabel && (result.best || result.last) && (
@@ -42,7 +55,7 @@ export default function GameResultsScreen({ result, onPlayAgain, onBackToSetup, 
             )}
             {result.best && (
               <>
-                <span className="font-semibold text-[var(--text)]">Best:</span>{" "}
+                <span className="font-semibold text-[var(--text)]">{labels.bestLabel}:</span>{" "}
                 {result.best.score}/{result.best.round}
               </>
             )}
@@ -51,7 +64,7 @@ export default function GameResultsScreen({ result, onPlayAgain, onBackToSetup, 
             )}
             {result.last && (
               <>
-                <span className="font-semibold text-[var(--text)]">Last:</span>{" "}
+                <span className="font-semibold text-[var(--text)]">{labels.lastLabel}:</span>{" "}
                 {result.last.score}/{result.last.round}
               </>
             )}
@@ -70,7 +83,7 @@ export default function GameResultsScreen({ result, onPlayAgain, onBackToSetup, 
             {showMistakes && (
               <div className="surface-soft rounded-lg p-4 text-sm text-[var(--text)]">
                 <p className="text-xs uppercase tracking-wide text-[var(--text-soft)]">
-                  Missed Questions (preview)
+                  {labels.missedQuestionsLabel ?? "Missed Questions (preview)"}
                 </p>
                 <div className="mt-3 space-y-2">
                   {previewMistakes.map((item, index) => (
