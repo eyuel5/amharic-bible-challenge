@@ -14,27 +14,50 @@ function shuffle(items) {
 function pickQuestionOrder(pool, questionCount) {
   const remaining = shuffle(pool)
   const selections = []
+  const usedBooks = new Set()
 
   while (remaining.length > 0 && selections.length < questionCount) {
     if (selections.length === 0) {
-      selections.push(remaining.shift())
+      const first = remaining.shift()
+      selections.push(first)
+      usedBooks.add(first.bookId)
       continue
     }
 
     const last = selections[selections.length - 1]
+    const remainingBooks = new Set(remaining.map((item) => item.bookId))
+    if (usedBooks.size >= remainingBooks.size) {
+      usedBooks.clear()
+    }
+
     let nextIndex = remaining.findIndex(
-      (item) => item.bookId !== last.bookId && item.chapter !== last.chapter,
+      (item) =>
+        item.bookId !== last.bookId &&
+        item.chapter !== last.chapter &&
+        !usedBooks.has(item.bookId),
     )
+
+    if (nextIndex === -1) {
+      nextIndex = remaining.findIndex(
+        (item) => item.bookId !== last.bookId && !usedBooks.has(item.bookId),
+      )
+    }
 
     if (nextIndex === -1) {
       nextIndex = remaining.findIndex((item) => item.bookId !== last.bookId)
     }
 
     if (nextIndex === -1) {
+      nextIndex = remaining.findIndex((item) => !usedBooks.has(item.bookId))
+    }
+
+    if (nextIndex === -1) {
       nextIndex = 0
     }
 
-    selections.push(remaining.splice(nextIndex, 1)[0])
+    const nextItem = remaining.splice(nextIndex, 1)[0]
+    selections.push(nextItem)
+    usedBooks.add(nextItem.bookId)
   }
 
   return selections

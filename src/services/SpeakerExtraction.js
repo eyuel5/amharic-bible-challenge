@@ -192,6 +192,11 @@ function hasToken(text, target) {
   return tokens.includes(target)
 }
 
+function hasAnyToken(text, targets) {
+  if (!text || !Array.isArray(targets) || targets.length === 0) return false
+  return targets.some((target) => hasToken(text, target))
+}
+
 function isFigureTaggedByName(name, tagSet) {
   if (!name) return false
   const figure = figureByName.get(name)
@@ -650,9 +655,16 @@ export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
             speaker = priorVerseSpeaker
           }
         }
-        const priorSaidToHim = hasToken(priorText, "አሉት")
-        if (priorSaidToHim && options.fallbackSpeaker && !prefaceHasAlias) {
-          speaker = options.fallbackSpeaker
+        const priorSaidToHim = hasAnyToken(priorText, [
+          "አሉት",
+          "ጠየቁት",
+          "ጠየቀው",
+          "ጠየቃቸው",
+          "ጠየቃት",
+          "ጠየቀችው",
+        ])
+        if (priorSaidToHim && !prefaceHasAlias) {
+          speaker = priorListener ?? options.fallbackSpeaker ?? speaker
         }
         const shouldPreferJesus =
           GOSPEL_BOOKS.has(bookId) &&

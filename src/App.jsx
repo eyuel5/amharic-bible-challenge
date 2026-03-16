@@ -36,7 +36,7 @@ const modes = [
     label: "Verse Speaker",
     description: "Identify who said the verse from narrative books.",
     Component: VerseSpeakerGame,
-    allowSingleBookSource: true,
+    allowSingleBookSource: false,
   },
 ]
 
