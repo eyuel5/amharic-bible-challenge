@@ -196,7 +196,7 @@ export const BIBLE_FIGURES = [
 { "id": "amos", "name": "አሞጽ", "aliases": ["አሞጽ"], "books": ["amo"], "tags": ["prophet", "speaker"] },
 { "id": "amaziah_priest", "name": "አሜስያስ", "aliases": ["አሜስያስ"], "books": ["amo"], "tags": ["priest", "speaker"] },
 { "id": "haggai", "name": "ሐጌ", "aliases": ["ሐጌ"], "books": ["hag"], "tags": ["prophet", "speaker"] },
-{ "id": "angel_of_the_lord", "name": "የእግዚአብሔር መልአከ", "aliases": ["የእግዚአብሔር መልአከ"], "books": ["mat", "luk"], "tags": ["messenger", "speaker"] },
+{ "id": "angel_of_the_lord", "name": "የእግዚአብሔር መልአክ", "aliases": ["የእግዚአብሔር መልአክ", "የእግዚአብሔር መልአከ", "የጌታ መልአክ"], "books": ["mat", "luk"], "tags": ["messenger", "speaker"] },
 { "id": "magi", "name": "ሰብአ ሰገል", "aliases": ["ሰብአ ሰገል"], "books": ["mat"], "tags": ["group", "speaker"] },
 { "id": "herod_the_great", "name": "ሄሮድስ", "aliases": ["ሄሮድስ"], "books": ["mat"], "tags": ["king", "speaker"] },
 { "id": "john_the_baptist", "name": "መጥምቁ ዮሐንስ", "aliases": ["መጥምቁ ዮሐንስ"], "books": ["mat", "mrk", "luk", "jhn"], "tags": ["prophet", "speaker"] },
