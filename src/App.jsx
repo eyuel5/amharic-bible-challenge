@@ -173,7 +173,7 @@ function App() {
   const [themePack, setThemePack] = useState(() => {
     const saved = window.localStorage.getItem("themePack")
     if (saved && availableThemePacks.has(saved)) return saved
-    return "serika-dark"
+    return "ocean"
   })
   const [language, setLanguage] = useState(() => {
     const saved = window.localStorage.getItem("language")
