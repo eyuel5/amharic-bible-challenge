@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { BookOpen, Settings } from "lucide-react"
+import { ArrowLeft, BookOpen, Settings } from "lucide-react"
 import GameResultsScreen from "./components/game/layouts/GameResultsScreen"
 import GameSettingsScreen from "./components/game/layouts/GameSettingsScreen"
 import GameSetupScreen from "./components/game/layouts/GameSetupScreen"
@@ -310,6 +310,16 @@ function App() {
               <Settings size={18} />
             </button>
           )}
+          {stage === "settings" && (
+            <button
+              type="button"
+              onClick={closeSettings}
+              className="chip-btn inline-flex h-11 w-11 items-center justify-center self-start"
+              aria-label="Back"
+            >
+              <ArrowLeft size={18} />
+            </button>
+          )}
         </header>
 
         {stage === "setup" && (
@@ -350,7 +360,7 @@ function App() {
         )}
 
         {stage === "settings" && (
-          <section className="mt-8 space-y-4">
+          <section className="mt-8">
             <GameSettingsScreen
               themePack={themePack}
               onThemePackChange={setThemePack}
@@ -358,9 +368,6 @@ function App() {
               onLanguageChange={setLanguage}
               labels={labels}
             />
-            <button type="button" onClick={closeSettings} className="ghost-btn px-5 py-3 text-sm">
-              Back
-            </button>
           </section>
         )}
       </section>

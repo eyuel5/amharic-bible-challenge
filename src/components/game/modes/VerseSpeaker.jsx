@@ -168,12 +168,12 @@ export default function VerseSpeakerGame({ questionCount, sourceScope, sourceBoo
   return (
     <>
       <div className="surface mt-6 p-4 text-sm">
-        <p className="text-[var(--text)]">
-          Progress:{" "}
+        <div className="flex items-center gap-2 text-[var(--text)]" aria-label="Progress">
+          <span className="font-semibold text-[var(--text-soft)]">Q.</span>
           <span className="font-semibold">
             {Math.min(currentIndex + (answerResult ? 1 : 0), totalQuestions)} / {totalQuestions}
           </span>
-        </p>
+        </div>
       </div>
 
       <div className="surface-soft mt-6 p-5">
