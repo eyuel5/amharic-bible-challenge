@@ -105,7 +105,10 @@ function getAliasesForBook(bookId) {
   if (!bookId) return figureAliasIndex
   if (aliasesByBookId.has(bookId)) return aliasesByBookId.get(bookId)
 
-  const filtered = figureAliasIndex.filter((entry) => entry.books?.includes(bookId))
+  const filtered = figureAliasIndex.filter((entry) => {
+    if (!entry.books || entry.books.length === 0) return true
+    return entry.books.includes(bookId)
+  })
   const result = filtered.length > 0 ? filtered : figureAliasIndex
   aliasesByBookId.set(bookId, result)
   return result
@@ -157,6 +160,24 @@ function endsWithIntroPronounSegment(segment) {
   return INTRO_PRONOUNS.includes(lastToken)
 }
 
+function getEndingIntroPronoun(segment) {
+  const cleaned = segment.trim()
+  if (!cleaned) return null
+  const tokens = cleaned.split(/\s+/).filter(Boolean)
+  if (tokens.length === 0) return null
+  const lastToken = stripEdgePunctuation(tokens[tokens.length - 1])
+  return INTRO_PRONOUNS.includes(lastToken) ? lastToken : null
+}
+
+function findAliasAfterToken(text, token, aliasEntries, bookId) {
+  if (!text || !token) return null
+  const idx = text.indexOf(token)
+  if (idx === -1) return null
+  const matches = findAliasMatches(text, aliasEntries, bookId)
+  const match = matches.find((item) => item.index > idx)
+  return match ? match.speaker : null
+}
+
 function startsWithIntroPronounSegment(segment) {
   const cleaned = segment.trim()
   if (!cleaned) return false
@@ -164,6 +185,27 @@ function startsWithIntroPronounSegment(segment) {
   if (tokens.length === 0) return false
   const firstToken = stripEdgePunctuation(tokens[0])
   return INTRO_PRONOUNS.includes(firstToken)
+}
+
+function trimQuoteAtIntroPronoun(quote) {
+  if (!quote) return quote
+  let qIndex = quote.indexOf(QUESTION_MARK)
+  while (qIndex !== -1) {
+    const rest = quote.slice(qIndex + QUESTION_MARK.length)
+    if (startsWithIntroPronounSegment(rest)) {
+      return quote.slice(0, qIndex + QUESTION_MARK.length).trim()
+    }
+    qIndex = quote.indexOf(QUESTION_MARK, qIndex + QUESTION_MARK.length)
+  }
+  let index = quote.indexOf(FULL_STOP)
+  while (index !== -1) {
+    const rest = quote.slice(index + FULL_STOP.length)
+    if (startsWithIntroPronounSegment(rest)) {
+      return quote.slice(0, index).trim()
+    }
+    index = quote.indexOf(FULL_STOP, index + FULL_STOP.length)
+  }
+  return quote
 }
 
 function isAliasAllowed(entry, bookId) {
@@ -238,6 +280,19 @@ function findAliasMatches(segment, aliasEntries, bookId, options = {}) {
   return matches.sort((a, b) => a.index - b.index)
 }
 
+function findExactAliasSpeaker(segment, aliasEntries) {
+  const cleaned = stripEdgePunctuation(segment.trim())
+  if (!cleaned) return null
+  const suffixes = ["", "ም", "ን", "ንም", "ና", "ናም"]
+  for (const entry of aliasEntries) {
+    for (const suffix of suffixes) {
+      if (cleaned === `${entry.alias}${suffix}`) {
+        return { speaker: entry.name, suffix }
+      }
+    }
+  }
+  return null
+}
 function findLastToken(segment) {
   const tokens = segment.trim().split(/\s+/).filter(Boolean)
   if (tokens.length === 0) return null
@@ -290,6 +345,7 @@ function resolveEndingVerbSegment(
   fallbackGroupSpeaker,
   fallbackAltSpeaker,
   fallbackAltGroupSpeaker,
+  options = {},
 ) {
   const trimmed = segment.trim()
   if (!trimmed) return null
@@ -306,6 +362,7 @@ function resolveEndingVerbSegment(
   const verbTokenIndex = tokens.length - 1
   const nearMatch = [...matches].reverse().find((match) => {
     const tokenIndex = getWordIndexAt(trimmed, match.index)
+    if (match.suffix === "ን" || match.suffix === "ንም") return false
     return tokenIndex >= verbTokenIndex - 2
   })
 
@@ -333,13 +390,17 @@ function resolveEndingVerbSegment(
 
   if (introPronounMarker) {
     const inferredSpeaker = findPrimarySpeakerInText(trimmed, aliasEntries, bookId, { requireGroup: isGroupVerb })
+    const priorText = options.priorVerseText ?? ""
+    const priorListener = priorText
+      ? findListenerFromSegment(priorText, aliasEntries, bookId, { requireGroup: isGroupVerb })
+      : null
     const fallback =
       isGroupVerb
         ? fallbackAltGroupSpeaker ?? fallbackGroupSpeaker
         : fallbackAltSpeaker ?? fallbackSpeaker
     return {
       mode: "after",
-      speaker: inferredSpeaker ?? fallback ?? null,
+      speaker: inferredSpeaker ?? priorListener ?? fallback ?? null,
       listener: null,
     }
   }
@@ -362,8 +423,15 @@ function resolveSpeakerFromSegment(segment, aliasEntries, bookId) {
   const trimmed = segment.trim()
   if (!trimmed) return null
 
+  const exact = findExactAliasSpeaker(trimmed, aliasEntries)
+  if (exact && exact.suffix !== "ን" && exact.suffix !== "ንም") {
+    return { speaker: exact.speaker, listener: null }
+  }
+
   const matches = findAliasMatches(trimmed, aliasEntries, bookId)
-  if (matches.length === 0) return null
+  if (matches.length === 0) {
+    return null
+  }
 
   const lastMatch = matches[matches.length - 1]
 
@@ -444,7 +512,7 @@ function buildQuoteFromParts(parts, startIndex) {
     const remaining = parts.slice(startIndex + usedParts).join(FULL_STOP)
     if (remaining) {
       if (startsWithIntroPronounSegment(remaining)) {
-        return quote
+        return trimQuoteAtIntroPronoun(quote)
       }
       const extra = buildQuoteUntilPunctuation(remaining, 0)
       if (extra) {
@@ -453,7 +521,7 @@ function buildQuoteFromParts(parts, startIndex) {
     }
   }
 
-  return quote
+  return trimQuoteAtIntroPronoun(quote)
 }
 
 function buildQuoteUntilPunctuation(text, startIndex) {
@@ -494,6 +562,13 @@ export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
     if (!segment) continue
 
     if (endsWithIntroPronounSegment(segment)) {
+      const introPronoun = getEndingIntroPronoun(segment)
+      const isFeminineIntro = introPronoun === "እርስዋ" || introPronoun === "እርስዋም"
+      const previousSegment = index > 0 ? parts[index - 1]?.trim() : ""
+      const spouseTokens = ["ሚስቱን", "ሚስቱ", "ሚስቱም", "ሚስቱንም"]
+      const spouseMention = isFeminineIntro
+        ? spouseTokens.map((token) => findAliasAfterToken(previousSegment, token, aliasEntries, bookId)).find(Boolean)
+        : null
       const priorGroupListener =
         index > 0 ? findPriorListener(parts, index - 1, aliasEntries, bookId, { requireGroup: true }) : null
       const priorListener = index > 0 ? findPriorListener(parts, index - 1, aliasEntries, bookId) : null
@@ -501,13 +576,24 @@ export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
       const quote = buildQuoteUntilPunctuation(remaining, 0)
       if (quote) {
         let speaker =
+          spouseMention ??
           priorGroupListener ??
           priorListener ??
           (index > 0 ? options.fallbackAltSpeaker ?? options.fallbackSpeaker : options.fallbackSpeaker)
 
         const priorText = options.priorVerseText ?? ""
+        const prefaceHasAlias = findAliasMatches(segment, aliasEntries, bookId).length > 0
+        if (!prefaceHasAlias && priorText) {
+          const priorVerseSpeaker = findPrimarySpeakerInText(priorText, aliasEntries, bookId)
+          if (
+            priorVerseSpeaker &&
+            (!speaker || speaker === options.fallbackSpeaker || speaker === options.fallbackAltSpeaker)
+          ) {
+            speaker = priorVerseSpeaker
+          }
+        }
         const priorSaidToHim = hasToken(priorText, "አሉት")
-        if (priorSaidToHim && options.fallbackSpeaker && (!speaker || speaker === options.fallbackAltSpeaker)) {
+        if (priorSaidToHim && options.fallbackSpeaker && !prefaceHasAlias) {
           speaker = options.fallbackSpeaker
         }
         const shouldPreferJesus =
@@ -538,6 +624,7 @@ export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
       options.fallbackGroupSpeaker,
       options.fallbackAltSpeaker,
       options.fallbackAltGroupSpeaker,
+      { priorVerseText: options.priorVerseText },
     )
     if (endingVerbInfo) {
       if (!endingVerbInfo.speaker) continue
@@ -649,7 +736,9 @@ export async function collectSpeakerQuotes({ sourceScope, sourceBookId, maxQuote
         }
 
         const nextVerseText = chapter.verses[verseIndex + 1]
-        const priorVerseText = chapter.verses[verseIndex - 1]
+        const priorVerseText = [chapter.verses[verseIndex - 2], chapter.verses[verseIndex - 1]]
+          .filter(Boolean)
+          .join(" ")
         const quotes = extractSpeakerQuotesFromVerse(text, book.id, {
           fallbackSpeaker: lastSpeaker,
           fallbackAltSpeaker: lastAltSpeaker,
