@@ -55,6 +55,14 @@ const QUESTION_MARK = "?"
 const SPEECH_VERB_SET = new Set(SPEECH_VERBS)
 const ENDING_VERB_SET = new Set(ENDING_SPEECH_VERBS)
 const GROUP_ENDING_VERBS = new Set(["አሉ", "ተናገሩ", "መለሱ", "መለሱለት"])
+const SAID_TO_TOKENS = [
+  "አለው",
+  "አለት",
+  "አላት",
+  "አላቸው",
+  "አሉት",
+  "አሉአቸው",
+]
 const PUNCTUATION_CLASS = PUNCTUATIONS.map((char) => `\\${char}`).join("")
 
 const EXTRA_SPEAKER_ENTRIES = [
@@ -382,9 +390,15 @@ function findListenerFromSegment(segment, aliasEntries, bookId, options = {}) {
   const matches = findAliasMatches(trimmed, aliasEntries, bookId, { requireGroup })
   if (matches.length === 0) return null
 
-  const listenerMatch = [...matches]
-    .reverse()
-    .find((match) => match.suffix === "ን" || match.suffix === "ንም")
+  const listenerMatch = [...matches].reverse().find((match) => {
+    if (match.suffix === "ን" || match.suffix === "ንም") return true
+    const prefixIndex = match.index - 1
+    if (prefixIndex < 0) return false
+    if (trimmed[prefixIndex] !== "ለ") return false
+    if (prefixIndex === 0) return true
+    const beforePrefix = trimmed[prefixIndex - 1]
+    return /\s/u.test(beforePrefix) || new RegExp(`[${PUNCTUATION_CLASS}]`, "u").test(beforePrefix)
+  })
 
   return listenerMatch ? listenerMatch.speaker : null
 }
@@ -627,6 +641,8 @@ export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
     if (endsWithIntroPronounSegment(segment)) {
       const introPronoun = getEndingIntroPronoun(segment)
       const isFeminineIntro = introPronoun === "እርስዋ" || introPronoun === "እርስዋም"
+      const segmentSpeaker = findPrimarySpeakerInText(segment, aliasEntries, bookId)
+      const saidToInSegment = hasAnyToken(segment, SAID_TO_TOKENS)
       const previousSegment = index > 0 ? parts[index - 1]?.trim() : ""
       const spouseTokens = ["ሚስቱን", "ሚስቱ", "ሚስቱም", "ሚስቱንም"]
       const spouseMention = isFeminineIntro
@@ -635,19 +651,34 @@ export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
       const priorGroupListener =
         index > 0 ? findPriorListener(parts, index - 1, aliasEntries, bookId, { requireGroup: true }) : null
       const priorListener = index > 0 ? findPriorListener(parts, index - 1, aliasEntries, bookId) : null
+      const priorText = options.priorVerseText ?? ""
+      const priorVerseSpeaker = priorText ? findPrimarySpeakerInText(priorText, aliasEntries, bookId) : null
+      const sameAsPriorVerseSpeaker = Boolean(
+        segmentSpeaker && priorVerseSpeaker && segmentSpeaker === priorVerseSpeaker,
+      )
       const remaining = parts.slice(index + 1).join(FULL_STOP)
       const quote = buildQuoteUntilPunctuation(remaining, 0)
       if (quote) {
+        const quoteHasSaidTo = hasAnyToken(quote, SAID_TO_TOKENS)
         let speaker =
           spouseMention ??
           priorGroupListener ??
           priorListener ??
-          (index > 0 ? options.fallbackAltSpeaker ?? options.fallbackSpeaker : options.fallbackSpeaker)
+          (options.fallbackAltSpeaker ?? options.fallbackSpeaker)
 
-        const priorText = options.priorVerseText ?? ""
         const prefaceHasAlias = findAliasMatches(segment, aliasEntries, bookId).length > 0
-        if (!prefaceHasAlias && priorText) {
-          const priorVerseSpeaker = findPrimarySpeakerInText(priorText, aliasEntries, bookId)
+        const priorTextHasDirectedSpeech = hasAnyToken(priorText, [
+          "አሉት",
+          "ጠየቁት",
+          "ጠየቀው",
+          "ጠየቃቸው",
+          "ጠየቃት",
+          "ጠየቀችው",
+          "ተናገሩት",
+        ])
+        if (saidToInSegment && segmentSpeaker && (sameAsPriorVerseSpeaker || !priorVerseSpeaker)) {
+          speaker = spouseMention ?? priorGroupListener ?? priorListener ?? null
+        } else if (!prefaceHasAlias && priorText && !(quoteHasSaidTo && priorTextHasDirectedSpeech)) {
           if (
             priorVerseSpeaker &&
             (!speaker || speaker === options.fallbackSpeaker || speaker === options.fallbackAltSpeaker)
@@ -676,6 +707,7 @@ export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
           speaker = JESUS_NAME
         }
 
+        if (!speaker) continue
         candidates.push({
           speaker: forcedSpeaker ?? speaker ?? null,
           listener: null,
