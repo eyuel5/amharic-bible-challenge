@@ -65,6 +65,7 @@ function App() {
   const [previousStage, setPreviousStage] = useState("setup")
   const [sessionResult, setSessionResult] = useState(null)
   const [sessionKey, setSessionKey] = useState(0)
+  const [sessionStartAt, setSessionStartAt] = useState(null)
 
   const activeMode = useMemo(() => {
     return modes.find((mode) => mode.id === modeId) ?? modes[0]
@@ -90,15 +91,64 @@ function App() {
   function startSession() {
     setSessionResult(null)
     setSessionKey((value) => value + 1)
+    setSessionStartAt(Date.now())
     setStage("playing")
   }
 
   function handleSessionComplete(result) {
+    const durationSeconds = sessionStartAt ? Math.round((Date.now() - sessionStartAt) / 1000) : null
+    const sourceLabel =
+      effectiveSourceScope === "single"
+        ? allBooks.find((book) => book.id === sourceBookId)?.nameAm ?? "Single Book"
+        : effectiveSourceScope.toUpperCase()
+    const statsKey =
+      effectiveSourceScope === "single"
+        ? `${activeMode.id}:${effectiveSourceScope}:${sourceBookId}`
+        : `${activeMode.id}:${effectiveSourceScope}:all`
+    let best = null
+    let last = null
+    if (typeof window !== "undefined") {
+      try {
+        const raw = window.localStorage.getItem(`sessionStats:${statsKey}`)
+        const parsed = raw ? JSON.parse(raw) : null
+        best = parsed?.best ?? null
+        last = parsed?.last ?? null
+      } catch (error) {
+        best = null
+        last = null
+      }
+    }
+
+    const currentStats = {
+      score: result.score,
+      round: result.round,
+      ratio: result.round > 0 ? result.score / result.round : 0,
+    }
+    const nextBest =
+      !best || currentStats.ratio > best.ratio ? currentStats : best
+    const nextLast = currentStats
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.setItem(
+          `sessionStats:${statsKey}`,
+          JSON.stringify({ best: nextBest, last: nextLast }),
+        )
+      } catch (error) {
+        // Ignore storage errors (private mode, quota, etc.)
+      }
+    }
+
     setSessionResult({
       ...result,
       modeId: activeMode.id,
       modeLabel: activeMode.label,
       questionCount,
+      sourceScope: effectiveSourceScope,
+      sourceBookId,
+      sourceLabel,
+      durationSeconds,
+      best: nextBest ?? best,
+      last: nextLast ?? last,
     })
     setStage("results")
   }

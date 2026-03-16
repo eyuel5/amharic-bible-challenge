@@ -100,6 +100,7 @@ export default function VerseRecallGame({ questionCount, sourceScope, sourceBook
   const [answerResult, setAnswerResult] = useState(null)
   const [round, setRound] = useState(0)
   const [score, setScore] = useState(0)
+  const [mistakes, setMistakes] = useState([])
 
   const sourceBooks = useMemo(() => {
     if (sourceScope === "ot") return allBooks.filter((book) => book.testament === "ot")
@@ -171,12 +172,22 @@ export default function VerseRecallGame({ questionCount, sourceScope, sourceBook
 
     if (correct) {
       setScore((value) => value + 1)
+    } else {
+      setMistakes((items) => [
+        ...items,
+        {
+          id: `${currentQuestion.answerBookName}:${currentQuestion.answerChapter}:${currentQuestion.answerVerseNumber}`,
+          prompt: currentQuestion.prompt,
+          correctAnswer: currentQuestion.answerWord,
+          yourAnswer: word,
+        },
+      ])
     }
   }
 
   function finishSession() {
     const accuracy = round === 0 ? 0 : Math.round((score / round) * 100)
-    onComplete({ score, round, accuracy })
+    onComplete({ score, round, accuracy, mistakes })
   }
 
   useEffect(() => {

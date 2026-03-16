@@ -94,6 +94,7 @@ export default function VerseSpeakerGame({ questionCount, sourceScope, sourceBoo
   const [selectedAnswer, setSelectedAnswer] = useState("")
   const [answerResult, setAnswerResult] = useState(null)
   const [score, setScore] = useState(0)
+  const [mistakes, setMistakes] = useState([])
 
   const currentQuestion = useMemo(() => questions[currentIndex] ?? null, [currentIndex, questions])
   const totalQuestions = questions.length
@@ -140,6 +141,16 @@ export default function VerseSpeakerGame({ questionCount, sourceScope, sourceBoo
     setAnswerResult(correct ? "correct" : "wrong")
     if (correct) {
       setScore((value) => value + 1)
+    } else {
+      setMistakes((items) => [
+        ...items,
+        {
+          id: `${currentQuestion.bookId}:${currentQuestion.chapter}:${currentQuestion.verseNumber}`,
+          prompt: currentQuestion.quote,
+          correctAnswer: currentQuestion.speaker,
+          yourAnswer: speaker,
+        },
+      ])
     }
   }
 
@@ -151,7 +162,7 @@ export default function VerseSpeakerGame({ questionCount, sourceScope, sourceBoo
 
   function finishSession() {
     const accuracy = totalQuestions === 0 ? 0 : Math.round((score / totalQuestions) * 100)
-    onComplete({ score, round: totalQuestions, accuracy })
+    onComplete({ score, round: totalQuestions, accuracy, mistakes })
   }
 
   return (
