@@ -67,12 +67,20 @@ function buildQuestions(pool, questionCount) {
   const selections = pickQuestionOrder(pool, questionCount)
   const uniqueSpeakers = [...new Set(pool.map((item) => item.speaker).filter(Boolean))]
   const fallbackSpeakers = [...new Set(BIBLE_FIGURES.map((figure) => figure.name).filter(Boolean))]
+  const figureTagsByName = new Map(
+    BIBLE_FIGURES.map((figure) => [figure.name, Array.isArray(figure.tags) ? figure.tags : []]),
+  )
 
   return selections.map((item) => {
+    const isWomenSpeaker = figureTagsByName.get(item.speaker)?.includes("women")
     const basePool = uniqueSpeakers.filter((name) => name !== item.speaker)
     const extraPool = fallbackSpeakers.filter((name) => name !== item.speaker && !basePool.includes(name))
     const combinedPool = [...basePool, ...extraPool]
-    const distractors = shuffle(combinedPool).slice(0, 3)
+    const filteredPool = isWomenSpeaker
+      ? combinedPool.filter((name) => figureTagsByName.get(name)?.includes("women"))
+      : combinedPool
+    const poolForOptions = filteredPool.length >= 3 ? filteredPool : combinedPool
+    const distractors = shuffle(poolForOptions).slice(0, 3)
     const options = shuffle([item.speaker, ...distractors])
     return { ...item, options }
   })
