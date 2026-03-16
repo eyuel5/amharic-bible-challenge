@@ -23,7 +23,7 @@ function getBookOptions(correctBookId, candidateBooks, optionCount = 4) {
   return shuffle([correctBook, ...distractors].filter(Boolean))
 }
 
-export default function VerseToBookGame({ questionCount, sourceScope, sourceBookId, onComplete }) {
+export default function VerseToBookGame({ questionCount, sourceScope, sourceBookId, onComplete, labels }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [currentQuestion, setCurrentQuestion] = useState(null)
@@ -167,10 +167,10 @@ export default function VerseToBookGame({ questionCount, sourceScope, sourceBook
             {answerResult && (
               <div className="mt-5 rounded-lg border border-[var(--stroke)] bg-[var(--panel)] p-4 text-sm">
                 <p className={answerResult === "correct" ? "text-[var(--success)]" : "text-[var(--danger)]"}>
-                  {answerResult === "correct" ? "Correct." : "Not correct."}
+                  {answerResult === "correct" ? labels.correct : labels.notCorrect}
                 </p>
                 <p className="mt-2 text-[var(--text-soft)]">
-                  Answer: {currentQuestion.answerBookName} (Chapter {currentQuestion.answerChapter}, Verse{" "}
+                  {labels.answerLabel}: {currentQuestion.answerBookName} (Chapter {currentQuestion.answerChapter}, Verse{" "}
                   {currentQuestion.answerVerseNumber})
                 </p>
                 {round >= questionCount ? (
@@ -179,7 +179,7 @@ export default function VerseToBookGame({ questionCount, sourceScope, sourceBook
                     onClick={finishSession}
                     className="primary-btn mt-4 px-4 py-2 text-sm"
                   >
-                    See Results
+                    {labels.seeResults}
                   </button>
                 ) : (
                   <button
@@ -187,7 +187,7 @@ export default function VerseToBookGame({ questionCount, sourceScope, sourceBook
                     onClick={startNextRound}
                     className="primary-btn mt-4 px-4 py-2 text-sm"
                   >
-                    Next Question
+                    {labels.nextQuestion}
                   </button>
                 )}
               </div>

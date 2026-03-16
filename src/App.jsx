@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { Settings } from "lucide-react"
+import { BookOpen, Settings } from "lucide-react"
 import GameResultsScreen from "./components/game/layouts/GameResultsScreen"
 import GameSettingsScreen from "./components/game/layouts/GameSettingsScreen"
 import GameSetupScreen from "./components/game/layouts/GameSetupScreen"
@@ -9,36 +9,116 @@ import VerseSpeakerGame from "./components/game/modes/VerseSpeaker"
 import VerseToBookGame from "./components/game/modes/VerseToBook"
 import { getAllBooks, validateBooksCatalog } from "./services/bibleService"
 
-const modes = [
-  {
-    id: "verse-to-book",
-    label: "Verse to Book",
-    description: "Read a verse and choose the correct book.",
-    Component: VerseToBookGame,
-    allowSingleBookSource: false,
+const copyByLanguage = {
+  en: {
+    title: "Amharic Bible Challenge",
+    description: "A focused Bible quiz experience with purposeful modes and session-based play.",
+    chooseMode: "Choose Mode",
+    sessionSettings: "Session Settings",
+    questionsPerSession: "Questions per session",
+    questionSource: "Question source",
+    singleBook: "Single Book",
+    selectBook: "Select Book",
+    singleBookDisabled:
+      "Single-book source is disabled for this mode because the player is guessing the book name.",
+    sources: {
+      all: "All",
+      ot: "Old Testament",
+      nt: "New Testament",
+    },
+    settingsTitle: "Settings",
+    themePresets: "Theme Presets",
+    languageLabel: "Language",
+    startGame: "Start Game",
+    nextQuestion: "Next Question",
+    playAgain: "Play Again",
+    changeModeOrSettings: "Change Mode or Settings",
+    answerLabel: "Answer",
+    seeResults: "See Results",
+    correct: "Correct.",
+    notCorrect: "Not correct.",
+    sessionComplete: "Session Complete",
+    sessionSummary: "Session Summary",
+    reviewMistakes: "Review Mistakes",
+    hideMistakes: "Hide Mistakes",
+    languageOptions: [
+      { id: "am", label: "አማርኛ" },
+      { id: "en", label: "English" },
+    ],
+    modes: {
+      verseToBook: {
+        label: "Verse to Book",
+        description: "Read a verse and choose the correct book.",
+      },
+      verseRecall: {
+        label: "Verse Recall",
+        description: "Fill in the missing word from a verse.",
+      },
+      bookOrder: {
+        label: "Book Order",
+        description: "Choose the next Bible book in sequence.",
+      },
+      verseSpeaker: {
+        label: "Verse Speaker",
+        description: "Identify who said the verse from narrative books.",
+      },
+    },
   },
-  {
-    id: "verse-recall",
-    label: "Verse Recall",
-    description: "Fill in the missing word from a verse.",
-    Component: VerseRecallGame,
-    allowSingleBookSource: true,
+  am: {
+    title: "የመጽሐፍ ቅዱስ ጥያቄዎች",
+    description:
+      "በተለያየ የጥያቄ አማራጮችና የአጠያየቅ መንገዶች፣ የመጽሐፍ ቅዱስ እውቀትዎን የሚፈትሹበት እና የሚማሩበት ቦታ።",
+    chooseMode: "አይነት ይምረጡ",
+    sessionSettings: "ማስተካከያ",
+    questionsPerSession: "የጥያቄዎቹ ብዛት",
+    questionSource: "የጥያቄዎቹ ምንጭ",
+    singleBook: "አንድ መጽሐፍ",
+    selectBook: "መጽሐፍ ይምረጡ",
+    singleBookDisabled: "ለዚህ አይነት አንድ መጽሐፍ ብቻ መምረጥ አይፈቀድም",
+    sources: {
+      all: "ሁሉም",
+      ot: "ብሉይ ኪዳን",
+      nt: "አዲስ ኪዳን",
+    },
+    settingsTitle: "ማስተካከያ",
+    themePresets: "የቅጥ ቅንብሮች",
+    languageLabel: "ቋንቋ",
+    startGame: "ጀምር",
+    nextQuestion: "ቀጣይ ጥያቄ",
+    playAgain: "እንደገና ተጫወት",
+    changeModeOrSettings: "አይነት ቀይር ወይ ወደ ማስተካከያ",
+    answerLabel: "መልስ",
+    seeResults: "ውጤቱን ተመልከት",
+    correct: "ትክክል!",
+    notCorrect: "ትክክል አይደለም።",
+    sessionComplete: "ጨዋታው ተጠናቋል",
+    sessionSummary: "የጨዋታው ማጠቃለያ",
+    reviewMistakes: "ስህተቶችን ተመልከት",
+    hideMistakes: "ስህተቶችን ደብቅ",
+    languageOptions: [
+      { id: "am", label: "አማርኛ" },
+      { id: "en", label: "English" },
+    ],
+    modes: {
+      verseToBook: {
+        label: "ጥቅሱን ለይተህ እወቅ",
+        description: "ጥቅሱን አንብበህ የሚገኝበትን መጽሐፍ ምረጥ።",
+      },
+      verseRecall: {
+        label: "ጥቅሱን አሟላ",
+        description: "ከጥቅሱ ውስጥ የጎደለውን ቃል ሙላ።",
+      },
+      bookOrder: {
+        label: "የመጻሕፍት ቅደም ተከተል",
+        description: "የመጽሐፍ ቅዱስ መጻሕፍትን በቅደም ተከተላቸው መሠረት ምረጥ።",
+      },
+      verseSpeaker: {
+        label: "ተናጋሪውን ለይ",
+        description: "ጥቅሱን የተናገረውን አካል ለይተህ እወቅ።",
+      },
+    },
   },
-  {
-    id: "book-order",
-    label: "Book Order",
-    description: "Choose the next Bible book in sequence.",
-    Component: BookOrderGame,
-    allowSingleBookSource: false,
-  },
-  {
-    id: "verse-speaker",
-    label: "Verse Speaker",
-    description: "Identify who said the verse from narrative books.",
-    Component: VerseSpeakerGame,
-    allowSingleBookSource: false,
-  },
-]
+}
 
 const allBooks = getAllBooks()
 const availableThemePacks = new Set([
@@ -57,7 +137,41 @@ function App() {
     if (saved && availableThemePacks.has(saved)) return saved
     return "serika-dark"
   })
-  const [modeId, setModeId] = useState(modes[0].id)
+  const [language, setLanguage] = useState(() => {
+    const saved = window.localStorage.getItem("language")
+    return saved === "en" ? "en" : "am"
+  })
+  const labels = copyByLanguage[language] ?? copyByLanguage.am
+  const modes = useMemo(
+    () => [
+      {
+        id: "verse-to-book",
+        ...labels.modes.verseToBook,
+        Component: VerseToBookGame,
+        allowSingleBookSource: false,
+      },
+      {
+        id: "verse-recall",
+        ...labels.modes.verseRecall,
+        Component: VerseRecallGame,
+        allowSingleBookSource: true,
+      },
+      {
+        id: "book-order",
+        ...labels.modes.bookOrder,
+        Component: BookOrderGame,
+        allowSingleBookSource: false,
+      },
+      {
+        id: "verse-speaker",
+        ...labels.modes.verseSpeaker,
+        Component: VerseSpeakerGame,
+        allowSingleBookSource: false,
+      },
+    ],
+    [labels],
+  )
+  const [modeId, setModeId] = useState("verse-to-book")
   const [questionCount, setQuestionCount] = useState(10)
   const [sourceScope, setSourceScope] = useState("all")
   const [sourceBookId, setSourceBookId] = useState(allBooks[0]?.id ?? "")
@@ -85,6 +199,10 @@ function App() {
     document.body.setAttribute("data-theme-pack", themePack)
     window.localStorage.setItem("themePack", themePack)
   }, [themePack])
+
+  useEffect(() => {
+    window.localStorage.setItem("language", language)
+  }, [language])
 
   const ActiveGameComponent = activeMode.Component
 
@@ -172,11 +290,15 @@ function App() {
       <section className="mx-auto w-full max-w-5xl px-5 py-8 sm:py-10">
         <header className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-start">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-soft)]">Amharic Bible Challenge</p>
-            <h1 className="title-font mt-2 text-4xl font-semibold sm:text-5xl">Scripture Quest</h1>
-            <p className="mt-2 text-sm text-[var(--text-soft)]">
-              A focused Bible quiz experience with purposeful modes and session-based play.
-            </p>
+            <h1 className="title-font mt-2 inline-flex items-center gap-2 text-xl font-medium tracking-wide text-[var(--text)] sm:text-2xl">
+              <BookOpen size={18} />
+              {labels.title}
+            </h1>
+            {stage === "setup" && (
+              <p className="mt-2 text-sm text-[var(--text-soft)]">
+                {labels.description}
+              </p>
+            )}
           </div>
           {(stage === "setup" || stage === "results") && (
             <button
@@ -203,6 +325,7 @@ function App() {
             onSourceBookChange={setSourceBookId}
             sourceBooks={allBooks}
             onStart={startSession}
+            labels={labels}
           />
         )}
 
@@ -213,6 +336,7 @@ function App() {
             sourceScope={effectiveSourceScope}
             sourceBookId={sourceBookId}
             onComplete={handleSessionComplete}
+            labels={labels}
           />
         )}
 
@@ -221,12 +345,19 @@ function App() {
             result={sessionResult}
             onPlayAgain={playAgain}
             onBackToSetup={() => setStage("setup")}
+            labels={labels}
           />
         )}
 
         {stage === "settings" && (
           <section className="mt-8 space-y-4">
-            <GameSettingsScreen themePack={themePack} onThemePackChange={setThemePack} />
+            <GameSettingsScreen
+              themePack={themePack}
+              onThemePackChange={setThemePack}
+              language={language}
+              onLanguageChange={setLanguage}
+              labels={labels}
+            />
             <button type="button" onClick={closeSettings} className="ghost-btn px-5 py-3 text-sm">
               Back
             </button>

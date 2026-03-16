@@ -10,12 +10,12 @@ const themes = [
   { id: "dawn", label: "Dawn", swatch: ["#f4f2f8", "#8d77c8", "#2f2a39"] },
 ]
 
-export default function GameSettingsScreen({ themePack, onThemePackChange }) {
+export default function GameSettingsScreen({ themePack, onThemePackChange, language, onLanguageChange, labels }) {
   return (
     <div className="surface min-w-[290px] space-y-3 p-3">
       <div>
-        <p className="text-xs uppercase tracking-[0.16em] text-[var(--text-soft)]">Settings</p>
-        <p className="text-sm text-[var(--text)]">Theme Presets</p>
+        <p className="text-xs uppercase tracking-[0.16em] text-[var(--text-soft)]">{labels.settingsTitle}</p>
+        <p className="text-sm text-[var(--text)]">{labels.themePresets}</p>
       </div>
 
       <div className="grid gap-2">
@@ -43,6 +43,22 @@ export default function GameSettingsScreen({ themePack, onThemePackChange }) {
             </span>
           </button>
         ))}
+      </div>
+
+      <div className="space-y-2 pt-2">
+        <p className="text-sm text-[var(--text)]">{labels.languageLabel}</p>
+        <div className="flex flex-wrap gap-2">
+          {labels.languageOptions.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              onClick={() => onLanguageChange(option.id)}
+              className={`chip-btn px-3 py-2 text-sm ${language === option.id ? "active" : ""}`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   )

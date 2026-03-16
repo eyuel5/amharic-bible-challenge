@@ -10,14 +10,22 @@ export default function GameSetupScreen({
   onSourceBookChange,
   sourceBooks,
   onStart,
+  labels,
 }) {
   const selectedMode = modes.find((mode) => mode.id === selectedModeId) ?? modes[0]
   const canUseSingleBook = Boolean(selectedMode.allowSingleBookSource)
 
+  const sourceOptions = [
+    { id: "all", label: labels.sources.all },
+    { id: "ot", label: labels.sources.ot },
+    { id: "nt", label: labels.sources.nt },
+    ...(canUseSingleBook ? [{ id: "single", label: labels.singleBook }] : []),
+  ]
+
   return (
     <section className="mt-8 space-y-6">
       <div className="surface p-6">
-        <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">Choose Mode</p>
+        <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">{labels.chooseMode}</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {modes.map((mode) => {
             const selected = mode.id === selectedModeId
@@ -37,10 +45,10 @@ export default function GameSetupScreen({
       </div>
 
       <div className="surface-soft p-6">
-        <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">Session Settings</p>
+        <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">{labels.sessionSettings}</p>
 
         <div className="mt-4">
-          <p className="text-sm text-[var(--text-soft)]">Questions per session</p>
+          <p className="text-sm text-[var(--text-soft)]">{labels.questionsPerSession}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {[5, 10, 15, 20].map((count) => (
               <button
@@ -56,14 +64,9 @@ export default function GameSetupScreen({
         </div>
 
         <div className="mt-6">
-          <p className="text-sm text-[var(--text-soft)]">Question source</p>
+          <p className="text-sm text-[var(--text-soft)]">{labels.questionSource}</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {[
-              { id: "all", label: "All" },
-              { id: "ot", label: "Old Testament" },
-              { id: "nt", label: "New Testament" },
-              ...(canUseSingleBook ? [{ id: "single", label: "Single Book" }] : []),
-            ].map((scope) => (
+            {sourceOptions.map((scope) => (
               <button
                 key={scope.id}
                 type="button"
@@ -77,13 +80,13 @@ export default function GameSetupScreen({
 
           {!canUseSingleBook && (
             <p className="mt-3 text-xs text-[var(--text-soft)]">
-              Single-book source is disabled for this mode because the player is guessing the book name.
+              {labels.singleBookDisabled}
             </p>
           )}
 
           {canUseSingleBook && sourceScope === "single" && (
             <div className="mt-4">
-              <p className="text-sm text-[var(--text-soft)]">Select book</p>
+              <p className="text-sm text-[var(--text-soft)]">{labels.selectBook}</p>
               <select
                 className="mt-2 w-full rounded-md border border-[var(--stroke)] bg-[var(--panel)] px-3 py-2 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)]"
                 value={sourceBookId}
@@ -105,7 +108,7 @@ export default function GameSetupScreen({
         onClick={onStart}
         className="primary-btn w-full px-5 py-3 text-sm sm:w-auto"
       >
-        Start Game
+        {labels.startGame}
       </button>
     </section>
   )

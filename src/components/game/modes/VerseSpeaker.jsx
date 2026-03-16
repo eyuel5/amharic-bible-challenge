@@ -86,7 +86,7 @@ function buildQuestions(pool, questionCount) {
   })
 }
 
-export default function VerseSpeakerGame({ questionCount, sourceScope, sourceBookId, onComplete }) {
+export default function VerseSpeakerGame({ questionCount, sourceScope, sourceBookId, onComplete, labels }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [questions, setQuestions] = useState([])
@@ -216,10 +216,10 @@ export default function VerseSpeakerGame({ questionCount, sourceScope, sourceBoo
             {answerResult && (
               <div className="mt-5 rounded-lg border border-[var(--stroke)] bg-[var(--panel)] p-4 text-sm">
                 <p className={answerResult === "correct" ? "text-[var(--success)]" : "text-[var(--danger)]"}>
-                  {answerResult === "correct" ? "Correct." : "Not correct."}
+                  {answerResult === "correct" ? labels.correct : labels.notCorrect}
                 </p>
                 <p className="mt-2 text-[var(--text-soft)]">
-                  Answer: {currentQuestion.speaker} ({currentQuestion.bookName} {currentQuestion.chapter}:
+                  {labels.answerLabel}: {currentQuestion.speaker} ({currentQuestion.bookName} {currentQuestion.chapter}:
                   {currentQuestion.verseNumber})
                 </p>
                 {currentQuestion.listener && (
@@ -231,7 +231,7 @@ export default function VerseSpeakerGame({ questionCount, sourceScope, sourceBoo
                     onClick={finishSession}
                     className="primary-btn mt-4 px-4 py-2 text-sm"
                   >
-                    See Results
+                    {labels.seeResults}
                   </button>
                 ) : (
                   <button
@@ -239,7 +239,7 @@ export default function VerseSpeakerGame({ questionCount, sourceScope, sourceBoo
                     onClick={nextQuestion}
                     className="primary-btn mt-4 px-4 py-2 text-sm"
                   >
-                    Next Question
+                    {labels.nextQuestion}
                   </button>
                 )}
               </div>

@@ -8,7 +8,7 @@ function formatDuration(seconds) {
   return `${mins}:${String(secs).padStart(2, "0")}`
 }
 
-export default function GameResultsScreen({ result, onPlayAgain, onBackToSetup }) {
+export default function GameResultsScreen({ result, onPlayAgain, onBackToSetup, labels }) {
   const [showMistakes, setShowMistakes] = useState(false)
   const durationLabel = useMemo(() => formatDuration(result.durationSeconds), [result.durationSeconds])
   const mistakes = Array.isArray(result.mistakes) ? result.mistakes : []
@@ -17,8 +17,10 @@ export default function GameResultsScreen({ result, onPlayAgain, onBackToSetup }
   return (
     <section className="mt-8 space-y-6">
       <div className="surface p-6">
-        <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">Session Complete</p>
-        <h2 className="title-font mt-2 text-3xl font-semibold text-[var(--text)]">Session Summary</h2>
+        <p className="text-sm uppercase tracking-wide text-[var(--text-soft)]">{labels.sessionComplete}</p>
+        <h2 className="title-font mt-2 text-3xl font-semibold text-[var(--text)]">
+          {labels.sessionSummary}
+        </h2>
 
         <p className="mt-4 text-sm text-[var(--text)]">
           <span className="font-semibold">Score:</span> {result.score}/{result.round}
@@ -63,7 +65,7 @@ export default function GameResultsScreen({ result, onPlayAgain, onBackToSetup }
               onClick={() => setShowMistakes((value) => !value)}
               className="ghost-btn px-4 py-2 text-xs"
             >
-              {showMistakes ? "Hide Mistakes" : "Review Mistakes"}
+              {showMistakes ? labels.hideMistakes : labels.reviewMistakes}
             </button>
             {showMistakes && (
               <div className="surface-soft rounded-lg p-4 text-sm text-[var(--text)]">
@@ -96,14 +98,14 @@ export default function GameResultsScreen({ result, onPlayAgain, onBackToSetup }
           onClick={onPlayAgain}
           className="primary-btn px-5 py-3 text-sm"
         >
-          Play Again
+          {labels.playAgain}
         </button>
         <button
           type="button"
           onClick={onBackToSetup}
           className="ghost-btn px-5 py-3 text-sm"
         >
-          Change Mode or Settings
+          {labels.changeModeOrSettings}
         </button>
       </div>
     </section>
