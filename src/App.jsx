@@ -239,6 +239,11 @@ function App() {
   }, [themePack])
 
   useEffect(() => {
+    if (!window.matchMedia("(max-width: 639px)").matches) return
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" })
+  }, [stage, sessionKey])
+
+  useEffect(() => {
     window.localStorage.setItem("language", language)
   }, [language])
 
@@ -326,8 +331,8 @@ function App() {
   return (
     <main className="app-shell">
       <section className="mx-auto w-full max-w-5xl px-5 py-8 sm:py-10">
-        <header className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-start">
-          <div>
+        <header className="flex items-center justify-between gap-3">
+          <div className="min-w-0 flex-1">
             <h1 className="title-font mt-2 inline-flex items-center gap-2 text-xl font-medium tracking-wide text-[var(--text)] sm:text-2xl">
               <BookOpen size={18} />
               {labels.title}
@@ -342,20 +347,20 @@ function App() {
             <button
               type="button"
               onClick={openSettings}
-              className="chip-btn inline-flex h-11 w-11 items-center justify-center self-start"
+              className="chip-btn inline-flex h-9 w-9 shrink-0 items-center justify-center self-start sm:h-11 sm:w-11"
               aria-label="Open settings"
             >
-              <Settings size={18} />
+              <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           )}
           {stage === "settings" && (
             <button
               type="button"
               onClick={closeSettings}
-              className="chip-btn inline-flex h-11 w-11 items-center justify-center self-start"
+              className="chip-btn inline-flex h-9 w-9 shrink-0 items-center justify-center self-start sm:h-11 sm:w-11"
               aria-label="Back"
             >
-              <ArrowLeft size={18} />
+              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           )}
         </header>
