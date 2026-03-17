@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { getAllBooks, getRandomVerse, loadBookById } from "../../../services/bibleService"
+import amharicStopwords from "../../../data/amharicStopwords"
 
 const allBooks = getAllBooks()
 const fallbackDistractors = ["እግዚአብሔር", "ፍቅር", "ሕይወት", "ሰላም", "እምነት", "ቃል", "ጸጋ"]
@@ -25,7 +26,15 @@ function stripEdgePunctuation(word) {
   return word.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, "")
 }
 
-function getEligibleTokens(text) {
+function getTokensWithMeta(text) {
+  return text.split(/\s+/).map((token) => ({
+    raw: token,
+    clean: stripEdgePunctuation(token),
+    normalized: normalizeWord(token),
+  }))
+}
+
+function getEligibleTokens(text, stopwords = new Set()) {
   return text
     .split(/\s+/)
     .map((token, index) => ({
@@ -34,7 +43,10 @@ function getEligibleTokens(text) {
       clean: stripEdgePunctuation(token),
       normalized: normalizeWord(token),
     }))
-    .filter((token) => token.clean.length > 0 && token.normalized.length >= 2)
+    .filter(
+      (token) =>
+        token.clean.length > 0 && token.normalized.length >= 2 && !stopwords.has(token.normalized),
+    )
 }
 
 function maskToken(token) {
@@ -48,14 +60,21 @@ function buildQuestionText(text, targetIndex, maskedWord) {
   return next.join(" ")
 }
 
-function buildWordOptions(correctWord, distractors, optionCount = 4) {
+function buildWordOptions(correctWord, distractors, stopwords, excludedWords, optionCount = 4) {
   const normalizedCorrect = normalizeWord(correctWord)
   const uniqueDistractors = []
   const seen = new Set([normalizedCorrect])
 
   distractors.forEach((word) => {
     const normalized = normalizeWord(word)
-    if (!normalized || seen.has(normalized)) return
+    if (
+      !normalized ||
+      seen.has(normalized) ||
+      stopwords.has(normalized) ||
+      excludedWords.has(normalized)
+    ) {
+      return
+    }
     seen.add(normalized)
     uniqueDistractors.push(word)
   })
@@ -64,7 +83,7 @@ function buildWordOptions(correctWord, distractors, optionCount = 4) {
   if (needed > 0) {
     fallbackDistractors.forEach((word) => {
       const normalized = normalizeWord(word)
-      if (seen.has(normalized)) return
+      if (seen.has(normalized) || stopwords.has(normalized) || excludedWords.has(normalized)) return
       seen.add(normalized)
       uniqueDistractors.push(word)
     })
@@ -73,20 +92,25 @@ function buildWordOptions(correctWord, distractors, optionCount = 4) {
   return shuffle([correctWord, ...uniqueDistractors.slice(0, optionCount - 1)])
 }
 
-function collectVerseWords(verseText, correctWord) {
+function collectVerseWords(verseText, correctWord, stopwords, excludedWords) {
   return getEligibleTokens(verseText)
     .map((token) => token.clean)
-    .filter((word) => normalizeWord(word) !== normalizeWord(correctWord))
+    .filter(
+      (word) =>
+        normalizeWord(word) !== normalizeWord(correctWord) &&
+        !stopwords.has(normalizeWord(word)) &&
+        !excludedWords.has(normalizeWord(word)),
+    )
 }
 
-async function collectBookDistractors(bookPayload, correctWord, minCount = 3) {
+async function collectBookDistractors(bookPayload, correctWord, stopwords, excludedWords, minCount = 3) {
   const distractors = []
   const maxAttempts = 10
 
   for (let attempt = 0; attempt < maxAttempts && distractors.length < minCount; attempt += 1) {
     const sampleVerse = getRandomVerse(bookPayload)
     if (!sampleVerse?.text) continue
-    distractors.push(...collectVerseWords(sampleVerse.text, correctWord))
+    distractors.push(...collectVerseWords(sampleVerse.text, correctWord, stopwords, excludedWords))
   }
 
   return distractors
@@ -114,6 +138,7 @@ export default function VerseRecallGame({ questionCount, sourceScope, sourceBook
       throw new Error("No books found for the selected source.")
     }
 
+    const stopwordSet = new Set(amharicStopwords.map((word) => normalizeWord(word)))
     const maxAttempts = 12
     for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
       const bookMeta = pickRandom(sourceBooks)
@@ -121,15 +146,68 @@ export default function VerseRecallGame({ questionCount, sourceScope, sourceBook
       const randomVerse = getRandomVerse(payload)
       if (!randomVerse?.text) continue
 
-      const eligibleTokens = getEligibleTokens(randomVerse.text)
-      if (eligibleTokens.length < 2) continue
+      const eligibleTokens = getEligibleTokens(randomVerse.text, stopwordSet)
+      if (eligibleTokens.length < 2) {
+        const fallbackTokens = getEligibleTokens(randomVerse.text)
+        if (fallbackTokens.length < 2) continue
+        const targetToken = pickRandom(fallbackTokens)
+        const answerWord = targetToken.clean
+        const maskedWord = maskToken(targetToken.raw)
+        const allTokens = getTokensWithMeta(randomVerse.text)
+        const adjacentRepeats = new Set()
+        for (let i = 0; i < allTokens.length - 1; i += 1) {
+          const current = allTokens[i].normalized
+          const next = allTokens[i + 1].normalized
+          if (current && current === next) adjacentRepeats.add(current)
+        }
+        const leftWord = allTokens[targetToken.index - 1]?.normalized ?? ""
+        const rightWord = allTokens[targetToken.index + 1]?.normalized ?? ""
+        const excludedWords = new Set(
+          [leftWord, rightWord].filter((word) => word && !adjacentRepeats.has(word)),
+        )
+        const verseDistractors = collectVerseWords(randomVerse.text, answerWord, stopwordSet, excludedWords)
+        const bookDistractors = await collectBookDistractors(payload, answerWord, stopwordSet, excludedWords)
+        const options = buildWordOptions(
+          answerWord,
+          [...verseDistractors, ...bookDistractors],
+          stopwordSet,
+          excludedWords,
+        )
+        if (options.length < 2) continue
+
+        return {
+          prompt: buildQuestionText(randomVerse.text, targetToken.index, maskedWord),
+          answerWord,
+          answerChapter: randomVerse.chapter,
+          answerVerseNumber: randomVerse.verseNumber,
+          answerBookName: bookMeta.nameAm,
+          options,
+        }
+      }
 
       const targetToken = pickRandom(eligibleTokens)
       const answerWord = targetToken.clean
       const maskedWord = maskToken(targetToken.raw)
-      const verseDistractors = collectVerseWords(randomVerse.text, answerWord)
-      const bookDistractors = await collectBookDistractors(payload, answerWord)
-      const options = buildWordOptions(answerWord, [...verseDistractors, ...bookDistractors])
+      const allTokens = getTokensWithMeta(randomVerse.text)
+      const adjacentRepeats = new Set()
+      for (let i = 0; i < allTokens.length - 1; i += 1) {
+        const current = allTokens[i].normalized
+        const next = allTokens[i + 1].normalized
+        if (current && current === next) adjacentRepeats.add(current)
+      }
+      const leftWord = allTokens[targetToken.index - 1]?.normalized ?? ""
+      const rightWord = allTokens[targetToken.index + 1]?.normalized ?? ""
+      const excludedWords = new Set(
+        [leftWord, rightWord].filter((word) => word && !adjacentRepeats.has(word)),
+      )
+      const verseDistractors = collectVerseWords(randomVerse.text, answerWord, stopwordSet, excludedWords)
+      const bookDistractors = await collectBookDistractors(payload, answerWord, stopwordSet, excludedWords)
+      const options = buildWordOptions(
+        answerWord,
+        [...verseDistractors, ...bookDistractors],
+        stopwordSet,
+        excludedWords,
+      )
       if (options.length < 2) continue
 
       return {
