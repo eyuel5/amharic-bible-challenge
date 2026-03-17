@@ -42,6 +42,13 @@ function getOrderOptions(books, promptIndex, direction, optionCount = 4) {
   return shuffle([correct, ...distractors].filter(Boolean))
 }
 
+function buildOrderPrompt(direction, bookName, labels) {
+  const prefix = direction === "after" ? labels.comesAfterPrefix : labels.comesBeforePrefix
+  const suffix = direction === "after" ? labels.comesAfterSuffix : labels.comesBeforeSuffix
+  const spacer = suffix.startsWith("?") ? "" : " "
+  return `${prefix} ${bookName}${spacer}${suffix}`
+}
+
 export default function BookOrderGame({ questionCount, sourceScope, onComplete, labels }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -109,7 +116,7 @@ export default function BookOrderGame({ questionCount, sourceScope, onComplete, 
       setScore((value) => value + 1)
     } else {
       const selectedBook = allBooks.find((book) => book.id === bookId)
-      const prompt = `Which book comes ${currentQuestion.direction} ${currentQuestion.promptBook.nameAm}?`
+      const prompt = buildOrderPrompt(currentQuestion.direction, currentQuestion.promptBook.nameAm, labels)
       setMistakes((items) => [
         ...items,
         {
@@ -135,7 +142,7 @@ export default function BookOrderGame({ questionCount, sourceScope, onComplete, 
     <>
       <div className="surface mt-6 p-4 text-sm">
         <div className="flex items-center gap-2 text-[var(--text)]" aria-label="Progress">
-          <span className="font-semibold text-[var(--text-soft)]">Q.</span>
+          <span className="font-semibold text-[var(--text-soft)]">{labels.questionShort}</span>
           <span className="font-semibold">
             {Math.min(round + (answerResult ? 0 : 1), questionCount)} / {questionCount}
           </span>
