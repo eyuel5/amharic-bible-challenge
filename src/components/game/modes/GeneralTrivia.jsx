@@ -19,9 +19,22 @@ function shuffle(items) {
 }
 
 function buildOptions(question) {
-  const tagged = question.choices.map((choice, index) => ({
+  const choices = Array.isArray(question.choices) ? question.choices : []
+  const answerIndex = Number.isInteger(question.answerIndex) ? question.answerIndex : -1
+  const correctChoice = choices[answerIndex]
+  const targetCount = 4
+
+  let pickedChoices = choices
+  if (choices.length > targetCount && correctChoice !== undefined) {
+    const others = choices.filter((_, index) => index !== answerIndex)
+    const shuffledOthers = shuffle(others)
+    pickedChoices = [correctChoice, ...shuffledOthers.slice(0, targetCount - 1)]
+  }
+
+  const tagged = pickedChoices.map((choice, index) => ({
     label: choice,
-    isCorrect: index === question.answerIndex,
+    isCorrect: choice === correctChoice,
+    originalIndex: index,
   }))
   const shuffled = shuffle(tagged)
   const correct = shuffled.find((option) => option.isCorrect)
