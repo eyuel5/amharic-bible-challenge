@@ -4,6 +4,7 @@ import GameResultsScreen from "./components/game/layouts/GameResultsScreen"
 import GameSettingsScreen from "./components/game/layouts/GameSettingsScreen"
 import GameSetupScreen from "./components/game/layouts/GameSetupScreen"
 import BookOrderGame from "./components/game/modes/BookOrder"
+import GeneralTriviaGame from "./components/game/modes/GeneralTrivia"
 import VerseRecallGame from "./components/game/modes/VerseRecall"
 import VerseSpeakerGame from "./components/game/modes/VerseSpeaker"
 import VerseToBookGame from "./components/game/modes/VerseToBook"
@@ -45,12 +46,14 @@ const copyByLanguage = {
     scoreLabel: "Score",
     modeLabel: "Mode",
     sourceLabel: "Source",
+    referenceLabel: "Reference",
     timeLabel: "Time",
     bestLabel: "Best",
     lastLabel: "Last",
     missedQuestionsLabel: "Missed Questions (preview)",
     preparingQuestion: "Preparing question...",
     whichBookPrompt: "Which book is this verse from?",
+    chooseAnswerPrompt: "Choose the correct answer",
     bookOrderTitle: "Book Order",
     completeMissingWord: "Complete the missing word",
     whoSaidThis: "Who said this?",
@@ -81,6 +84,10 @@ const copyByLanguage = {
       verseSpeaker: {
         label: "Verse Speaker",
         description: "Identify who said the verse from narrative books.",
+      },
+      generalTrivia: {
+        label: "General Trivia",
+        description: "Answer classic Bible questions across people, events, and places.",
       },
     },
   },
@@ -119,12 +126,14 @@ const copyByLanguage = {
     scoreLabel: "ውጤት",
     modeLabel: "የጥያቄው አይነት",
     sourceLabel: "ምንጭ",
+    referenceLabel: "ማጣቀሻ",
     timeLabel: "ሰዓት",
     bestLabel: "ከፍተኛ ውጤት",
     lastLabel: "ያለፈው ውጤት",
     missedQuestionsLabel: "የተሳሳቱ ጥያቄዎች (በጥቂቱ)",
     preparingQuestion: "ጥያቄውን በማዘጋጀት ላይ...",
     whichBookPrompt: "ይህ ጥቅስ ከየትኛው መጽሐፍ የተወሰደ ነው?",
+    chooseAnswerPrompt: "ትክክለኛውን መልስ ምረጥ",
     bookOrderTitle: "የመጻሕፍት ቅደም ተከተል",
     completeMissingWord: "የጎደለውን ቃል አሟላ",
     whoSaidThis: "ይህንን የተናገረው ማን ነው?",
@@ -155,6 +164,10 @@ const copyByLanguage = {
       verseSpeaker: {
         label: "ተናጋሪውን ለይ",
         description: "ጥቅሱን የተናገረውን አካል ለይተህ እወቅ።",
+      },
+      generalTrivia: {
+        label: "አጠቃላይ ጥያቄዎች",
+        description: "ሰዎችን፣ ክስተቶችን እና ቦታዎችን የሚመለከቱ አጠቃላይ ጥያቄዎችን መልስ።",
       },
     },
   },
@@ -207,6 +220,12 @@ function App() {
         ...labels.modes.verseSpeaker,
         Component: VerseSpeakerGame,
         allowSingleBookSource: false,
+      },
+      {
+        id: "general-trivia",
+        ...labels.modes.generalTrivia,
+        Component: GeneralTriviaGame,
+        allowSingleBookSource: true,
       },
     ],
     [labels],

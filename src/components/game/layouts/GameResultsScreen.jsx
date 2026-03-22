@@ -32,6 +32,7 @@ export default function GameResultsScreen({ result, onPlayAgain, onBackToSetup, 
               "verse-recall": "verseRecall",
               "book-order": "bookOrder",
               "verse-speaker": "verseSpeaker",
+              "general-trivia": "generalTrivia",
             }
             const key = modeKeyMap[result.modeId]
             return key && labels.modes?.[key]?.label ? labels.modes[key].label : result.modeLabel
