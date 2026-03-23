@@ -198,6 +198,12 @@ function App() {
   const modes = useMemo(
     () => [
       {
+        id: "general-trivia",
+        ...labels.modes.generalTrivia,
+        Component: GeneralTriviaGame,
+        allowSingleBookSource: true,
+      },
+      {
         id: "verse-to-book",
         ...labels.modes.verseToBook,
         Component: VerseToBookGame,
@@ -221,16 +227,10 @@ function App() {
         Component: VerseSpeakerGame,
         allowSingleBookSource: false,
       },
-      {
-        id: "general-trivia",
-        ...labels.modes.generalTrivia,
-        Component: GeneralTriviaGame,
-        allowSingleBookSource: true,
-      },
     ],
     [labels],
   )
-  const [modeId, setModeId] = useState("verse-to-book")
+  const [modeId, setModeId] = useState("general-trivia")
   const [questionCount, setQuestionCount] = useState(10)
   const [sourceScope, setSourceScope] = useState("all")
   const [sourceBookId, setSourceBookId] = useState(allBooks[0]?.id ?? "")
