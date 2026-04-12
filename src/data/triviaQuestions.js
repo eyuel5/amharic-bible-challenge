@@ -395,7 +395,7 @@
     category: "laws",
     sourceBook: "lev",
     reference: { chapter: 11, verseStart: 7 },
-    explanation: "አሳማ ሰኮናው የተሰነጠቀ ቢሆንም ስለማያመሰኳ ርኩስ ነው።",
+    explanation: "አሳማ ሰኮናው የተሰነጠቀ ቢሆንም ስለማያመሰኳ ርኩስ ነው። (ማያመሰኳ = ደግሞ ማያመነዥግ)",
   },
   {
     id: "lev-006",
@@ -510,8 +510,8 @@
   // Numbers
   {
     id: "num-001",
-    question: "በመጀመሪያው ምዕራፍ ላይ ሙሴና አሮን የእስራኤልን ሕዝብ ለምን ቆጠሩ?",
-    choices: ["ለግብር", "ለጦርነት የሚወጡትን ለማወቅ", "ምግብ ለማከፋፈል", "ለስደት"],
+    question: "በኦሪት ዘኁልቁ መጀመሪያው ምዕራፍ ላይ ሙሴና አሮን የእስራኤልን ሕዝብ ለምን ቆጠሩ?",
+    choices: ["ለግብር", "ለጦርነት የሚወጡትን ለማወቅ", "ምግብ ለማከፋፈል", "ለምስጋና ለመዉጣት"],
     answerIndex: 1,
     difficulty: "medium",
     category: "history",
@@ -616,7 +616,7 @@
     category: "history",
     sourceBook: "num",
     reference: { chapter: 21, verseStart: 8, verseEnd: 9 },
-    explanation: "የናሱን እባብ በትረ ላይ ሰቅሎ የተነደፈው ሁሉ ሲያየው ይድን ነበር።",
+    explanation: "የናሱን እባብ በእንጨት ላይ ሰቅሎ የተነደፈው ሁሉ ሲያየው ይድን ነበር።",
   },
   {
     id: "num-011",
@@ -1173,8 +1173,8 @@
   },
   {
     id: "jdg-011",
-    question: "ከጦርነት ሲመለስ በመጀመሪያ ለተቀበለው ሰው መሥዋዕት ለማቅረብ ተሳልቶ ልጁን መሥዋዕት ያደረገው መስፍን ማን ነው?",
-    choices: ["ዮታም", "ዮፍታሔ", "አቤሜሌክ", "ኢብጻን"],
+    question: "ከጦርነት ሲመለስ በመጀመሪያ ሊገናኘው ከቤቱ ደጅ የሚያገኘዉን መሥዋዕት ለማቅረብ ተስሎ፣ ልጁን መሥዋዕት ያደረገው መስፍን ማን ነው?",
+    choices: ["ኢዮአታም", "ዮፍታሔ", "አቤሜሌክ", "ኢብጻን", "ሚካ", "አክአብ"],
     answerIndex: 1,
     difficulty: "hard",
     category: "people",
@@ -1235,7 +1235,7 @@
     category: "people",
     sourceBook: "jdg",
     reference: { chapter: 16, verseStart: 17, verseEnd: 18 },
-    explanation: "ደሊላ ደጋግማ በመውተውተብ የሳምሶንን ምስጢር አውጥታ ለጠላቶቹ አሳልፋ ሰጠችው።",
+    explanation: "ደሊላ ደጋግማ በመወትወት የሳምሶንን ምስጢር አውጥታ ለጠላቶቹ አሳልፋ ሰጠችው።",
   },
   {
     id: "jdg-017",
@@ -1272,8 +1272,8 @@
   },
   {
     id: "jdg-020",
-    question: "የመሳፍንት መጽሐፍ በመጨረሻው ቁጥር ላይ ምን ይላል?",
-    choices: ["እስራኤል ተጸጸተ", "በዚያ ዘመን በእስራኤል ንጉሥ አልነበረም", "ሙሴ ተመልሶ መጣ", "ዮርዳኖስ ደረቀ"],
+    question: "የመሳፍንት መጽሐፍ የመጨረሻው ቁጥር ላይ ምን ይላል?",
+    choices: ["እስራኤል ተጸጸተ", "በዚያ ዘመን በእስራኤል ንጉሥ አልነበረም", "ሙሴ ተመልሶ መጣ", "ዮርዳኖስ ደረቀ", "የእስራኤል ህዝብ በምስጋና ቀረቡ", "የእስራኤል ህዝብ ለአህዛብ መንግስት ተላልፈው ተሰጡ"],
     answerIndex: 1,
     difficulty: "medium",
     category: "books",
@@ -1703,19 +1703,19 @@
   },
   {
     id: "1sa-019",
-    question: "ዳዊት አማቱ ሳኦልን ሊገድለው ሲያሳድደው ያገባታ በጎ ያደረገችለት ብልህ ሴት ማን ናት?",
-    choices: ["ሚልኮል", "አቢግያ", "ቤርሳቤህ", "ታማር", "ሐና", "ሩት"],
+    question: "ናባል ዳዊትን በሰደበውና ባናደደው ጊዜ፣ በብልህነቷ ዳዊት ደም እንዳያፈስ መክራና ረድታ ያዳነችው፣ በኋላም የዳዊት ሚስት የሆነችው ሴት ማን ናት?",
+    choices: ["ሜልኮል", "አቢግያ", "ቤርሳቤህ", "ትዕማር", "ሐና", "አኪናሆም"],
     answerIndex: 1,
     difficulty: "medium",
     category: "people",
     sourceBook: "1sa",
-    reference: { chapter: 25, verseStart: 3, verseEnd: 33 },
-    explanation: "አቢግያ የናባል ሚስት ነበረች፤ በብልህነቷ ዳዊት ደም እንዳያፈስ መክራውና ረድታው ነበር።",
+    reference: { chapter: 25, verseStart: 3, verseEnd: 42 },
+    explanation: "አቢግያ የናባል ሚስት ነበረች፤ በብልህነቷ ዳዊት በቁጣ ተነሳስቶ ደም እንዳያፈስና በገዛ እጁ እንዳይበቀል መክራው ነበር። ናባል ከሞተ በኋላ ዳዊት አግብቷታል።",
   },
   {
     id: "1sa-020",
     question: "ሳኦል በመጨረሻው ጦርነት ላይ ሲሸነፍ እንዴት ሞተ?",
-    choices: ["ጎልያድ ገደለው", "ዳዊት ገደለው", "በራሱ ሰይፍ ላይ ወድቆ (ራሱን ገደለ)", "በእርጅና", "በአንበሳ ተበላ", "ሳሙኤል ገደለው"],
+    choices: ["ጎልያድ ገደለው", "ዳዊት ገደለው", "በራሱ ሰይፍ ላይ ወድቆ ራሱን ገደለ", "በእርጅና", "በአንበሳ ተበላ", "ሳሙኤል ገደለው"],
     answerIndex: 2,
     difficulty: "medium",
     category: "history",
@@ -1782,13 +1782,13 @@
   {
     id: "2sa-006",
     question: "ዳዊት በታቦቱ ፊት በደስታ ሲዘፍን የተናቀችውና የናቀችው ሚስቱ ማን ናት?",
-    choices: ["አቢግያ", "ቤርሳቤህ", "ሚልኮል", "አኪናሆም", "ታማር", "ማዓካ"],
+    choices: ["አቢግያ", "ቤርሳቤህ", "ሜልኮል", "አኪናሆም", "ትዕማር", "ማዓካ"],
     answerIndex: 2,
     difficulty: "medium",
     category: "people",
     sourceBook: "2sa",
     reference: { chapter: 6, verseStart: 16, verseEnd: 23 },
-    explanation: "የሳኦል ልጅ ሚልኮል ዳዊት በታቦቱ ፊት ሲዘፍን አይታ በልቧ ናቀችው፤ በዚህም ምክንያት ልጅ አልወለደችም።",
+    explanation: "የሳኦል ልጅ ሜልኮል ዳዊት በታቦቱ ፊት ሲዘፍን አይታ በልቧ ናቀችው፤ በዚህም ምክንያት ልጅ አልወለደችም።",
   },
   {
     id: "2sa-007",
@@ -1932,6 +1932,17 @@
     sourceBook: "2sa",
     reference: { chapter: 24, verseStart: 18, verseEnd: 25 },
     explanation: "ዳዊት በኢያቡሳዊው በኦርና አውድማ ላይ መሠዊያ ሠርቶ መሥዋዕት አቀረበ፤ መቅሰፍቱም ከዚያ በኋላ ቆመ።",
+  },
+  {
+    id: "2sa-021",
+    question: "ከሚከተሉት ሴቶች መካከል የንጉሥ ዳዊት ሚስት ያልነበረችው ማን ናት?",
+    choices: ["አቢግያ", "አኪናሆም", "ትዕማር", "ሜልኮል", "መዓካ", "ቤርሳቤህ", "አጊት"],
+    answerIndex: 2,
+    difficulty: "hard",
+    category: "people",
+    sourceBook: "2sa",
+    reference: { chapter: 13, verseStart: 1},
+    explanation: "ትዕማር የዳዊት ልጅ (የአቤሴሎም እህት) ናት። አቢግያ፣ አኪናሆም፣ ሜልኮል፣ መዓካ፣ አጊት እና ቤርሳቤህ ግን የዳዊት ሚስቶች ነበሩ።",
   },
   // 1 Kings
   {
@@ -2091,7 +2102,7 @@
   {
     id: "1ki-015",
     question: "ኤልያስን ልትገድለው የዛተችበት የአክዓብ ሚስት ማን ናት?",
-    choices: ["ቤርሳቤህ", "ኤልዛቤል", "ሚልኮል", "አታልያ", "ሐና", "ሩት"],
+    choices: ["ቤርሳቤህ", "ኤልዛቤል", "ሜልኮል", "አታልያ", "ሐና", "ሩት"],
     answerIndex: 1,
     difficulty: "easy",
     category: "people",
@@ -2175,7 +2186,7 @@
     category: "history",
     sourceBook: "2ki",
     reference: { chapter: 2, verseStart: 9, verseEnd: 10 },
-    explanation: "ኤልያስ 'ከአንተ ስወሰድ ብታየኝ ይሆንልሃል' ብሎት ነበር፤ ኤልሳዕም ሳይርገበገብ ተመልክቷል።",
+    explanation: "ኤልያስ 'ከአንተ ስወሰድ ብታየኝ ይሆንልሃል' ብሎት ነበር፤ ኤልሳዕም ይህን ተመልክቷል።",
   },
   {
     id: "2ki-003",
@@ -2318,7 +2329,7 @@
     category: "history",
     sourceBook: "2ki",
     reference: { chapter: 17, verseStart: 6 },
-    explanation: "የአሦር ንጉሥ ሰልምናሶር ሰማርያን ይዞ እስራኤልን አፈለሳቸው።",
+    explanation: "የአሦር ንጉሥ ስልምናሶር ሰማርያን ይዞ እስራኤልን አፈለሳቸው።",
   },
   {
     id: "2ki-016",
@@ -2688,7 +2699,7 @@
   {
     id: "2ch-014",
     question: "ንጉሥ ሕዝቅያስ በነገሠ በመጀመሪያው ወር ምን አደረገ?",
-    choices: ["ጦርነት ጀመረ", "ቤተ መቅደሱን ከፈተና አደሰ", "ሀብት አከማቸ", "ግብጽን ወረረ", "ግብዣ አደረገ", "ዝም አለ"],
+    choices: ["ጦርነት ጀመረ", "ቤተ መቅደሱን ከፈተና አደሰ", "ሀብቱን በሙሉ ለህዝቡ አከፋፈለ", "ግብጽን ወረረ", "ግብዣ አደረገ", "አማሌቅን ከአገሩ አጠፋ"],
     answerIndex: 1,
     difficulty: "medium",
     category: "history",
