@@ -1,4 +1,4 @@
-﻿export const triviaQuestions = [
+﻿export const triviaQuestionsOT = [
   {
     id: "gen-001",
     question: "በመጀመሪያው ቀን እግዚአብሔር ምን ፈጠረ?",

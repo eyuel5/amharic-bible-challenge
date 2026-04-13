@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { getAllBooks } from "../../../services/bibleService"
-import { triviaQuestions } from "../../../data/triviaQuestions"
+import { triviaQuestions } from "../../../data/questions/triviaQuestions"
 
 const allBooks = getAllBooks()
 const bookById = new Map(allBooks.map((book) => [book.id, book]))
