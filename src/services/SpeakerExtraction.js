@@ -630,7 +630,6 @@ export function extractSpeakerQuotesFromVerse(verseText, bookId, options = {}) {
   if (options.continuationText && !endsWithTerminal) {
     parts.push(options.continuationText)
   }
-  const results = []
   const candidates = []
   const forcedSpeaker = options.forcedSpeaker ?? null
 

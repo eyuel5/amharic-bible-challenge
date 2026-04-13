@@ -98,7 +98,6 @@ export default function VerseSpeakerGame({ questionCount, sourceScope, sourceBoo
 
   const currentQuestion = useMemo(() => questions[currentIndex] ?? null, [currentIndex, questions])
   const totalQuestions = questions.length
-  const round = Math.min(currentIndex + (answerResult ? 1 : 0), totalQuestions)
 
   const prepareGame = useCallback(async () => {
     setLoading(true)

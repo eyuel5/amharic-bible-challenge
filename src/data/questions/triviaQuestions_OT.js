@@ -1130,7 +1130,7 @@
   {
     id: "jdg-007",
     question: "የከነዓናውያንን የጦር አዛዥ ሲሳራን በድንኳን ካስማ የገደለችው ሴት ማን ናት?",
-    choices: ["ዲቦራ", "ናኑ", "ኢያኤል", "ሐና"],
+    choices: ["ዲቦራ", "አኪናሆም", "ኢያኤል", "ትዕማር", "አቢግያ"],
     answerIndex: 2,
     difficulty: "medium",
     category: "people",
@@ -1703,7 +1703,7 @@
   },
   {
     id: "1sa-019",
-    question: "ናባል ዳዊትን በሰደበውና ባናደደው ጊዜ፣ በብልህነቷ ዳዊት ደም እንዳያፈስ መክራና ረድታ ያዳነችው፣ በኋላም የዳዊት ሚስት የሆነችው ሴት ማን ናት?",
+    question: "ናባል ዳዊትን በሰደበውና ባናደደው ጊዜ፣ በብልህነቷ ዳዊት ደም እንዳያፈስ መክራና ረድታ ያዳነችው፣ በኋላም የዳዊት  የሆነችው ሚስትሴት ማን ናት?",
     choices: ["ሜልኮል", "አቢግያ", "ቤርሳቤህ", "ትዕማር", "ሐና", "አኪናሆም"],
     answerIndex: 1,
     difficulty: "medium",
@@ -2005,7 +2005,7 @@
     question: "ለቤተ መቅደሱ ሥራ የሚሆን የአርዘ ሊባኖስ እንጨት የላከለት የጢሮስ ንጉሥ ማን ይባላል?",
     choices: ["ኪራም", "ናቡከደነጾር", "ፈርዖን", "ሺሻቅ", "አክዓብ", "አርጤክስስ"],
     answerIndex: 0,
-    difficulty: "medium",
+    difficulty: "hard",
     category: "people",
     sourceBook: "1ki",
     reference: { chapter: 5, verseStart: 1, verseEnd: 10 },

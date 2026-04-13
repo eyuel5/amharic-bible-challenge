@@ -242,7 +242,7 @@ function App() {
 
   const activeMode = useMemo(() => {
     return modes.find((mode) => mode.id === modeId) ?? modes[0]
-  }, [modeId])
+  }, [modeId, modes])
 
   const effectiveSourceScope =
     !activeMode.allowSingleBookSource && sourceScope === "single" ? "all" : sourceScope
@@ -295,7 +295,7 @@ function App() {
         const parsed = raw ? JSON.parse(raw) : null
         best = parsed?.best ?? null
         last = parsed?.last ?? null
-      } catch (error) {
+      } catch {
         best = null
         last = null
       }
@@ -315,7 +315,7 @@ function App() {
           `sessionStats:${statsKey}`,
           JSON.stringify({ best: nextBest, last: nextLast }),
         )
-      } catch (error) {
+      } catch {
         // Ignore storage errors (private mode, quota, etc.)
       }
     }
