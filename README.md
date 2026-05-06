@@ -1,16 +1,78 @@
-# React + Vite
+# Amharic Bible Challenge 📖✨
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A bilingual Bible quiz web app for practicing Amharic Bible knowledge with interactive games, session scoring, and theme settings.
 
-Currently, two official plugins are available:
+**Live Demo:** https://amharicbibleq.netlify.app/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🌟 What this app offers
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+- **Five quiz modes** tailored to different Bible learning goals
+- **Amharic and English UI support** with language persistence across sessions
+- **Question source filters** for Old Testament, New Testament, or the entire Bible
+- **Progress tracking** with score, accuracy, and mistake review
+- **Responsive modern UI** built with React and Tailwind CSS
 
-## Expanding the ESLint configuration
+## 🎮 Available Game Modes
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Verse to Book** – Read a verse and choose the correct book of the Bible
+- **Verse Recall** – Complete a verse by filling in the missing word
+- **Book Order** – Pick the book that comes before or after a given book
+- **Verse Speaker** – Identify who spoke or narrated a verse
+- **General Trivia** – Answer Bible trivia about people, places, and events
+
+## ⚙️ Built with
+
+- **React 19**
+- **Vite**
+- **Tailwind CSS**
+- **Lucide React**
+- **ESLint**
+
+## 📁 Project structure
+
+- `src/App.jsx` — main application layout and mode selection
+- `src/components/game/` — game screens and mode components
+- `src/data/bible/` — Bible text and metadata
+- `src/data/questions/` — trivia question data
+- `src/services/` — Bible data helpers and utilities
+
+## 🚀 Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+Then open the local dev server URL shown in the console.
+
+## 📦 Build for production
+
+```bash
+npm run build
+```
+
+This outputs the static site to `dist/`.
+
+## 📡 Deployment
+
+The app is configured for Netlify via `netlify.toml`. The production build output is served from `dist`.
+
+## 🤝 Contribution
+
+Contributions are welcome. To add new questions or modes:
+
+1. Update the data files under `src/data/questions/` or `src/data/bible/`
+2. Add or extend a game mode in `src/components/game/modes/`
+3. Run `npm run lint` and verify the app behavior locally
+
+## 💡 Notes
+
+- The app saves theme and language preferences in `localStorage`.
+- Source filters let players focus on specific testaments or a single book.
+- Mistakes are tracked and shown after each session to help learning.
+
+---
+
+Made for practicing Amharic Bible knowledge with a fast, engaging quiz experience.
