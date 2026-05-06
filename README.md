@@ -4,6 +4,10 @@ A bilingual Bible quiz web app for practicing Amharic Bible knowledge with inter
 
 **Live Demo:** https://amharicbibleq.netlify.app/
 
+![App Screenshot 1](./screenshot1.png)
+![App Screenshot 2](./screenshot2.png)
+![App Screenshot 3](./screenshot3.png)
+
 ---
 
 ## 🌟 What this app offers
@@ -66,6 +70,8 @@ Contributions are welcome. To add new questions or modes:
 1. Update the data files under `src/data/questions/` or `src/data/bible/`
 2. Add or extend a game mode in `src/components/game/modes/`
 3. Run `npm run lint` and verify the app behavior locally
+
+If you find a typo in an Amharic verse, please open an issue or a pull request in `src/data/bible/`.
 
 ## 💡 Notes
 
